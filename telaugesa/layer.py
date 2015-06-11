@@ -20,12 +20,14 @@ import telaugesa.util as util;
 class Layer(object):
     """Abstract layer for Feed-forward Neural Networks"""
     
-    def _init__(self,
-                in_dim,
-                out_dim,
-                W=None,
-                bias=None,
-                use_bias=True):
+    def __init__(self,
+                 in_dim,
+                 out_dim,
+                 W=None,
+                 bias=None,
+                 use_bias=True,
+                 is_recursive=False,
+                 **kwargs):
         """Base Layer initalization
         
         Parameters
@@ -47,8 +49,11 @@ class Layer(object):
         self.W=W;
         self.bias=bias;
         self.use_bias=use_bias;
+        self.is_recursive=is_recursive;
         
         self.initialize();
+        
+        super(Layer, self).__init__(**kwargs);
         
     def initialize(self, weight_type="none"):
         """Initialize weights and bias
