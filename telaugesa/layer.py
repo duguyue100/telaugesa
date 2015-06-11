@@ -11,8 +11,6 @@ It can be base of:
 + Softmax layer
 """
 
-import numpy as np;
-
 import theano.tensor as T;
 
 import telaugesa.util as util;

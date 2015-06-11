@@ -5,10 +5,8 @@ Supported method:
 + Stochastic gradient descent
 """
 
-import numpy as np;
 from collections import OrderedDict;
 
-import theano;
 import theano.tensor as T;
 
 def gd_updates(cost,
@@ -18,7 +16,7 @@ def gd_updates(cost,
                learning_rate=0.1,
                eps=1e-6,
                rho=0.95,
-               method="adadelta"):
+               method="sgd"):
     """Gradient Descent based optimization
     
     Parameters

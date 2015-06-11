@@ -3,11 +3,6 @@
 This module implements base RNN class.
 """
 
-import numpy as np;
-
-import theano;
-import theano.tensor as T;
-
 import telaugesa.util as util;
 from telaugesa.layer import Layer;
 

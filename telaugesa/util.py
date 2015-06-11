@@ -4,7 +4,6 @@
 import numpy as np;
 
 import theano;
-import theano.tensor as T;
 
 def init_weights(name,
                  out_dim,

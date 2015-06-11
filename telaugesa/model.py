@@ -44,10 +44,7 @@ class FeedForward(object):
         for k, layer in enumerate(self.layers):
             level_out=layer_input;
             
-            if layer.is_recursive:
-                pass
-            else:
-                level_out=layer.apply(level_out);
+            level_out=layer.apply(level_out);
             
             out.append(level_out);
             

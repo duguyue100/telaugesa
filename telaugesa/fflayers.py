@@ -9,9 +9,6 @@ This module contains feedforward layers for
 + Softmax layer
 """
 
-import numpy as np;
-
-import theano;
 import theano.tensor as T;
 
 import telaugesa.nnfuns as nnfuns;
@@ -73,8 +70,8 @@ class SoftmaxLayer(Layer):
         
         Parameters
         ----------
-        X : matrix
-            input samples, the size is (number of cases, in_dim)
+        X_out : matrix
+            input sample outputs, the size is (number of cases, in_dim)
             
         Returns
         -------
@@ -89,10 +86,10 @@ class SoftmaxLayer(Layer):
         
         Parameters
         ----------
-        X : matrix
-            input samples, the size is (number of cases, in_dim)
+        X_out : vector
+            predict labels, the size is (number of cases, number of classes)
         Y : vector
-            respective correct lables, the size is (number of cases)
+            correct labels, the size is (number of cases)
             
         Returns
         -------
@@ -107,8 +104,8 @@ class SoftmaxLayer(Layer):
         
         Parameters
         ----------
-        X : matrix
-            input samples, the size is (number of cases, in_dim)
+        X_out : matrix
+            input sample outputs, the size is (number of cases, in_dim)
         Y : vector
             respective correct lables, the size is (number of cases)
             
