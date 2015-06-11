@@ -41,6 +41,6 @@ def gd_updates(cost,
     
     for gparam, param in zip(gparams, params):
         if method=="sgd":
-            updates[param]=param-gparam*learning_rate;
+            updates[param]=param-learning_rate*gparam;
             
     return updates;

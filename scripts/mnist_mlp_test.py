@@ -51,7 +51,7 @@ train=theano.function(inputs=[idx],
                               y: train_set_y[idx * batch_size: (idx + 1) * batch_size]});
 
 test=theano.function(inputs=[idx],
-                     outputs=model.layers[-1].error(out[-2], y),
+                     outputs=model.layers[-1].error(out[-1], y),
                      givens={X: test_set_x[idx * batch_size: (idx + 1) * batch_size],
                              y: test_set_y[idx * batch_size: (idx + 1) * batch_size]});
                               

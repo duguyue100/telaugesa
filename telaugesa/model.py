@@ -41,9 +41,8 @@ class FeedForward(object):
         
         out=[];
         layer_input=X;
+        level_out=layer_input;
         for k, layer in enumerate(self.layers):
-            level_out=layer_input;
-            
             level_out=layer.apply(level_out);
             
             out.append(level_out);

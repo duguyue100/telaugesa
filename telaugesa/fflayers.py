@@ -65,13 +65,13 @@ class SoftmaxLayer(Layer):
     def apply(self, X):
         return nnfuns.softmax(self.apply_lin(X));
     
-    def predict(self, X):
+    def predict(self, X_out):
         """Predict label
         
         Parameters
         ----------
         X_out : matrix
-            input sample outputs, the size is (number of cases, in_dim)
+            input sample outputs, the size is (number of cases, number of classes)
             
         Returns
         -------
@@ -79,9 +79,9 @@ class SoftmaxLayer(Layer):
             predicted label, the size is (number of cases)
         """
         
-        return T.argmax(self.apply(X), axis=1);
+        return T.argmax(X_out, axis=1);
     
-    def error(self, X, Y):
+    def error(self, X_out, Y):
         """Mis-classified label
         
         Parameters
@@ -97,7 +97,7 @@ class SoftmaxLayer(Layer):
             difference between predicted label and true label.
         """
     
-        return T.mean(T.neq(self.predict(X), Y));
+        return T.mean(T.neq(self.predict(X_out), Y));
     
     def cost(self, X, Y):
         """Cross-entropy cost
