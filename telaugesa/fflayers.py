@@ -118,5 +118,5 @@ class SoftmaxLayer(Layer):
             difference between output and true label.
         """
     
-        return T.nnet.categorical_crossentropy(self.apply(X), Y);
+        return T.nnet.categorical_crossentropy(self.apply(X), Y).mean();
     

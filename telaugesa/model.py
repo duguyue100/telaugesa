@@ -9,19 +9,19 @@ class FeedForward(object):
     """Feedforward Neural Network model"""
     
     def __init__(self,
-                 num_in,
+                 in_dim,
                  layers=None):
         """Initialize feedforward model
         
         Parameters
         ----------
-        num_in : int
+        in_dim : int
             number of input size
         layers : list
             list of layers
         """
         
-        self.num_in=num_in;
+        self.in_dim=in_dim;
         self.layers=layers;
         
     def fprop(self,
@@ -52,3 +52,7 @@ class FeedForward(object):
             out.append(level_out);
             
         return out;
+    
+    @property
+    def params(self):
+        return [param for layer in self.layers for param in layer.params];

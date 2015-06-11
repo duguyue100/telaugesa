@@ -15,7 +15,7 @@ def gd_updates(cost,
                params,
                updates=None,
                max_norm=5.0,
-               learning_rate=0.01,
+               learning_rate=0.1,
                eps=1e-6,
                rho=0.95,
                method="adadelta"):
@@ -24,9 +24,7 @@ def gd_updates(cost,
     Parameters
     ----------
     cost : scalar
-        (Scalar (0-dimensional) tensor variable. May optionally be None if 
-        known_grads is provided.) – a scalar with respect to which we are
-        differentiating
+        total cost of the cost function.
     params : list
         parameter list
     method : string
