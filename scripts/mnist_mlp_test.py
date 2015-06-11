@@ -7,7 +7,7 @@ import theano;
 import theano.tensor as T;
 
 import telaugesa.datasets as ds;
-from telaugesa.fflayers import TanhLayer;
+from telaugesa.fflayers import ReLULayer;
 from telaugesa.fflayers import SoftmaxLayer;
 from telaugesa.model import FeedForward;
 from telaugesa.optimize import gd_updates;
@@ -30,9 +30,9 @@ X=T.matrix("data");
 y=T.ivector("label");
 idx=T.lscalar();
 
-layer_0=TanhLayer(in_dim=784,
+layer_0=ReLULayer(in_dim=784,
                   out_dim=500);
-layer_1=TanhLayer(in_dim=500,
+layer_1=ReLULayer(in_dim=500,
                   out_dim=200);
 layer_2=SoftmaxLayer(in_dim=200,
                      out_dim=10);
