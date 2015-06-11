@@ -9,7 +9,6 @@ class FeedForward(object):
     """Feedforward Neural Network model"""
     
     def __init__(self,
-                 in_dim,
                  layers=None):
         """Initialize feedforward model
         
@@ -20,8 +19,6 @@ class FeedForward(object):
         layers : list
             list of layers
         """
-        
-        self.in_dim=in_dim;
         self.layers=layers;
         
     def fprop(self,
@@ -42,7 +39,7 @@ class FeedForward(object):
         out=[];
         layer_input=X;
         level_out=layer_input;
-        for k, layer in enumerate(self.layers):
+        for layer in enumerate(self.layers):
             level_out=layer.apply(level_out);
             
             out.append(level_out);

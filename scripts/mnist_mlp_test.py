@@ -37,8 +37,7 @@ layer_1=ReLULayer(in_dim=500,
 layer_2=SoftmaxLayer(in_dim=200,
                      out_dim=10);
                                           
-model=FeedForward(in_dim=784,
-                  layers=[layer_0, layer_1, layer_2]);
+model=FeedForward(layers=[layer_0, layer_1, layer_2]);
                   
 out=model.fprop(X);
 cost=model.layers[-1].cost(out[-2], y);

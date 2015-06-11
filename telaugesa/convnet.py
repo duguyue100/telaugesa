@@ -4,8 +4,7 @@ ConvNet base layer and extended layer
 
 """
 
-import theano;
-import theano.tensor as T;
+from theano.tensor.signal import downsample;
 from theano.tensor.nnet import conv;
 
 import telaugesa.util as util;
@@ -147,3 +146,60 @@ class ReLUConvLayer(ConvNetBase):
         
     def apply(self, X):
         return nnfuns.relu(self.apply_lin(X));
+    
+####################################
+# Pooling Layer
+####################################
+
+class MaxPooling(object):
+    """ Max Pooling Layer """
+    
+    def __init__(self,
+                 pool_size,
+                 step=None,
+                 **kwargs):
+        """Initialize max pooling
+        
+        Parameters
+        ----------
+        pool_size : tuple
+            height and width of pooling region
+        step : tuple
+            The vertical and horizontal shift (stride)
+        """
+        self.pool_size=pool_size;
+        self.step=step;
+        
+    def apply(self, X):
+        """apply max-pooling
+        
+        Parameters
+        ----------
+        X : 4D tensor
+            data with shape (batch_size, num_channels, height, width)
+            
+        Returns
+        -------
+        pooled : 4D tensor
+            max pooled out result
+        """
+        
+        return downsample.max_pool_2d(X, self.pool_size, st=self.step);
+    
+class Flattener(object):
+    """Flatten feature maps"""
+    
+    def apply(self, X):
+        """flatten feature map
+        
+        Parameters
+        ----------
+        X : 4D tensor
+            data with shape (batch_size, num_channels, height, width)
+            
+        Returns
+        -------
+        flatten_result : 2D matrix
+        """
+        
+        return X.flatten(ndim=2);
