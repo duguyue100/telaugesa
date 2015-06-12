@@ -19,6 +19,8 @@ def gd_updates(cost,
                method="sgd"):
     """Gradient Descent based optimization
     
+    Note: should be a class to make flexible call
+    
     Parameters
     ----------
     cost : scalar

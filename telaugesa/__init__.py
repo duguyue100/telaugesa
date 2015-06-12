@@ -11,6 +11,7 @@ __all__=["layer",
          "model",
          "optimize"
          "cost",
+         "train",
          "util",
          "nnfuns",
          "dataset"]
