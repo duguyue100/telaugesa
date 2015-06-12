@@ -38,7 +38,8 @@ class FeedForward(object):
         
         out=[];
         level_out=X;
-        for layer in enumerate(self.layers):
+        for k, layer in enumerate(self.layers):
+            
             level_out=layer.apply(level_out);
             
             out.append(level_out);
@@ -47,4 +48,4 @@ class FeedForward(object):
     
     @property
     def params(self):
-        return [param for layer in self.layers for param in layer.params];
+        return [param for layer in self.layers if hasattr(layer, 'params') for param in layer.params];
