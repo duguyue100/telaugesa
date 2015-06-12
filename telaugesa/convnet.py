@@ -4,6 +4,9 @@ ConvNet base layer and extended layer
 
 """
 
+import numpy as np;
+
+import theano;
 from theano.tensor.signal import downsample;
 from theano.tensor.nnet import conv;
 
@@ -57,6 +60,8 @@ class ConvNetBase(object):
         self.border_mode=border_mode;
         self.use_bias=use_bias;
         
+        self.initialize();
+        
     def initialize(self, weight_type="none"):
         """Initialize weights and bias
         
@@ -68,10 +73,19 @@ class ConvNetBase(object):
         
         # should have better implementation for convnet weights
         
+        fan_in = self.num_channels*np.prod(self.filter_size);
+        fan_out = self.num_filters*np.prod(self.filter_size);
         
+        filter_bound=np.sqrt(6./(fan_in + fan_out));
+        filter_shape=(self.num_filters, self.num_channels)+(self.filter_size);
+        self.filters = theano.shared(np.asarray(np.random.uniform(low=-filter_bound,
+                                                                  high=filter_bound,
+                                                                  size=filter_shape),
+                                                dtype='float32'),
+                                     borrow=True);
         
         if self.use_bias==True:
-            self.bias=util.init_weights("bias", self.num_filters, weight_type)
+            self.bias=util.init_weights("bias", self.num_filters, weight_type=weight_type);
         
     def apply_lin(self, X):
         """Apply convoution operation
@@ -94,7 +108,7 @@ class ConvNetBase(object):
                       subsample=self.step);
                       
         if self.use_bias:
-            Y+=self.b.dimshuffle('x', 0, 'x', 'x');
+            Y+=self.bias.dimshuffle('x', 0, 'x', 'x');
         
         return Y;
     

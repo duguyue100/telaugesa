@@ -27,7 +27,7 @@ class FeedForward(object):
         
         Parameters
         ----------
-        X : matrix
+        X : matrix or 4D tensor
             input samples, the size is (number of cases, in_dim)
             
         Returns
@@ -37,8 +37,7 @@ class FeedForward(object):
         """
         
         out=[];
-        layer_input=X;
-        level_out=layer_input;
+        level_out=X;
         for layer in enumerate(self.layers):
             level_out=layer.apply(level_out);
             
