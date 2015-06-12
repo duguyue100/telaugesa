@@ -10,6 +10,7 @@ __all__=["layer",
          "convnet"
          "model",
          "optimize"
+         "cost",
          "util",
          "nnfuns",
          "dataset"]

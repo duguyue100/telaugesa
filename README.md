@@ -42,8 +42,9 @@ General requirements can be achieved by `Anaconda`. More specifically, you need:
 
 + Training Algorithm
    + Stochastic gradient descent (SGD)
-   + Adagrad
-   + Adadelta
+   + Adagrad [TODO]
+   + Adadelta [TODO]
+   + Dropout [TODO]
 
 + Model
    + Feedforward Model

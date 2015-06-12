@@ -21,6 +21,7 @@ class Layer(object):
     def __init__(self,
                  in_dim,
                  out_dim,
+                 layer_name="Layer",
                  W=None,
                  bias=None,
                  use_bias=True,

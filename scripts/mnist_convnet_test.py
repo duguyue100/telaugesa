@@ -13,6 +13,8 @@ from telaugesa.convnet import MaxPooling;
 from telaugesa.convnet import Flattener;
 from telaugesa.model import FeedForward;
 from telaugesa.optimize import gd_updates;
+from telaugesa.cost import categorical_cross_entropy_cost;
+from telaugesa.cost import L2_regularization;
 
 n_epochs=100;
 batch_size=100;
@@ -61,7 +63,7 @@ layer_3=SoftmaxLayer(in_dim=200,
 model=FeedForward(layers=[layer_0, pool_0, layer_1, pool_1, flattener, layer_2, layer_3]);
 
 out=model.fprop(images);
-cost=model.layers[-1].cost(out[-1], y);
+cost=categorical_cross_entropy_cost(out[-1], y)+L2_regularization(model.params, 0.01);
 updates=gd_updates(cost=cost, params=model.params);
 
 train=theano.function(inputs=[idx],

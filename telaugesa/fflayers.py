@@ -98,22 +98,3 @@ class SoftmaxLayer(Layer):
         """
     
         return T.mean(T.neq(self.predict(X_out), Y));
-    
-    def cost(self, X_out, Y):
-        """Cross-entropy cost
-        
-        Parameters
-        ----------
-        X_out : matrix
-            input sample outputs, the size is (number of cases, in_dim)
-        Y : vector
-            respective correct lables, the size is (number of cases)
-            
-        Returns
-        -------
-        cost : scalar
-            difference between output and true label.
-        """
-    
-        return T.nnet.categorical_crossentropy(X_out, Y).mean();
-    

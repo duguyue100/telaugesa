@@ -44,3 +44,78 @@ def gd_updates(cost,
             updates[param]=param-learning_rate*gparam;
             
     return updates;
+
+theano_rng=T.shared_randomstreams.RandomStreams(1234);
+
+def dropout(shape, prob=0.):
+    """generate dropout mask
+    
+    Parameters
+    ----------
+    shape : tuple
+        shape of the dropout mask
+    prob : double
+        probability of each sample
+        
+    Returns
+    -------
+    mask : tensor
+        dropout mask
+    """
+    
+    mask=theano_rng.binominal(n=1, p=1-prob, size=shape);
+    return T.cast(x=mask, dtype="float32");
+
+def multi_dropout(shapes, prob=0.):
+    """generate a list of dropout mask
+    
+    Parameters
+    ----------
+    shapes : tuple of tuples
+        list of shapes of dropout masks
+    prob : double
+        probability of each sample
+    
+    Returns
+    -------
+    masks : tuple of tensors
+        list of dropout masks
+    """
+    return [dropout(shape, dropout) for shape in shapes];
+
+def apply_dropout(X, mask=None):
+    """apply dropout operation
+    
+    Parameters
+    ----------
+    X : tensor
+        data to be masked
+    mask : dropout mask
+    
+    Returns
+    -------
+    masked_X : tensor
+        dropout masked data
+    """
+    
+    if mask is not None:
+        return X*mask;
+    else:
+        return X;
+    
+def corrupt_input(X, corruption_level=0.):
+    """Add noise on data
+    
+    Parameters
+    ----------
+    X : tensor
+        data to be corrupted
+    corruption_level : double
+        probability of the corruption level
+    Returns
+    -------
+    corrupted_out : tensor
+        corrupted output 
+    """
+    
+    return apply_dropout(X, dropout(X.shape, corruption_level));

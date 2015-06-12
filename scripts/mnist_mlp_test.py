@@ -11,6 +11,7 @@ from telaugesa.fflayers import ReLULayer;
 from telaugesa.fflayers import SoftmaxLayer;
 from telaugesa.model import FeedForward;
 from telaugesa.optimize import gd_updates;
+from telaugesa.cost import categorical_cross_entropy_cost;
 
 n_epochs=100;
 batch_size=100;
@@ -40,7 +41,7 @@ layer_2=SoftmaxLayer(in_dim=200,
 model=FeedForward(layers=[layer_0, layer_1, layer_2]);
                   
 out=model.fprop(X);
-cost=model.layers[-1].cost(out[-1], y);
+cost=categorical_cross_entropy_cost(out[-1], y);
 updates=gd_updates(cost=cost, params=model.params);
 
 train=theano.function(inputs=[idx],
