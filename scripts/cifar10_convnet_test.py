@@ -1,6 +1,9 @@
 """CIFAR-10 ConvNet Test
 """
 
+import sys;
+sys.path.append("..");
+
 import numpy as np;
 
 import theano;
@@ -48,7 +51,7 @@ layer_0=ReLUConvLayer(filter_size=(7,7),
                       batch_size=batch_size);
                       
 pool_0=MaxPooling(pool_size=(2,2), step=(3,3));
-#pool_0=MaxPooling(pool_size=(2,2));
+#pool_0=MaxPooling(pool_size=(2,2), step=(2,2));
 
 #print DownsampleFactorMax.out_shape((26,26), (2,2), st=(3,3));
                       
