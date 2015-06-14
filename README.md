@@ -33,6 +33,7 @@ General requirements can be achieved by `Anaconda`. More specifically, you need:
    + Sigmoid Conv Layer
    + ReLU Conv Layer
    + Max-pooling Layer
+   + Same size Max-pooling Layer
    + Flatten Layer
 
 + Recurrent Neural Network

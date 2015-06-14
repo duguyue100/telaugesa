@@ -83,7 +83,7 @@ def L1_regularization(params, L1_rate=0.):
     
     cost=0;
     for param in params:
-        cost+=T.sum(param);
+        cost+=T.sum(T.abs_(param));
         
     return L1_rate*cost;
 

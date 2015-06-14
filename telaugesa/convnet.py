@@ -171,6 +171,7 @@ class MaxPooling(object):
     def __init__(self,
                  pool_size,
                  step=None,
+                 mode="max",
                  **kwargs):
         """Initialize max pooling
         
@@ -180,9 +181,13 @@ class MaxPooling(object):
             height and width of pooling region
         step : tuple
             The vertical and horizontal shift (stride)
+        mode : string
+            Pooling method: "max", "sum", "average_inc_pad", "average_exc_pad"
+            Max-pooling, Sum-pooling or Average-pooling
         """
         self.pool_size=pool_size;
         self.step=step;
+        self.mode=mode;
         
     def apply(self, X):
         """apply max-pooling
@@ -198,8 +203,45 @@ class MaxPooling(object):
             max pooled out result
         """
         
-        return downsample.max_pool_2d(X, self.pool_size, st=self.step);
+        ## Check if have bleeding edge support
+        if theano.__version__=="0.7.0":
+            if self.mode=="max":
+                return downsample.max_pool_2d(X, self.pool_size, st=self.step);
+            else:
+                raise ValueError("Value %s is not a valid choice of pooling method for %s"
+                                 % (self.mode, theano.__version__));
+        else:
+            return downsample.max_pool_2d(X, self.pool_size, st=self.step, mode=self.mode);
+        
+class MaxPoolingSameSize(object):
+    """Same size Max-pooling layer"""
     
+    def __init__(self, pool_size):
+        """Init a max-pooling same size layer
+        
+        Parameters
+        ----------
+        pool_size : tuple
+            size of the pool patch (patch height, patch width)
+        """
+    
+        self.pool_size=pool_size;
+        
+    def apply(self, X):
+        """Apply same size max-pooling operation
+        
+        Parameters
+        ----------
+        X : 4D tensor
+            Max pooling will be done over the 2 last dimensions.
+        """
+        
+        if theano.__version__=="0.7.0":
+            raise ValueError("Same size pooling is not supported in %s"
+                                 % (theano.__version__));
+        
+        return downsample.max_pool_2d_same_size(X, self.pool_size);
+        
 class Flattener(object):
     """Flatten feature maps"""
     
