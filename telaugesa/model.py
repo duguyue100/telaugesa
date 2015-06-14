@@ -79,3 +79,48 @@ class AutoEncoder(object):
         for layer in self.layers:
             assert hasattr(layer, 'params'), \
                 "Layer doesn't have necessary parameters";
+                
+class ConvKMeans(object):
+    """Convolutional K-means"""
+    
+    def __init__(self, layers):
+        """Init a Conv K-means model
+        
+        Parameters
+        ----------
+        layers : tuple of size 2
+            one conv layer, one arg-max pooling layer
+        """
+        
+        assert len(layers)==2, \
+            "Too many layers for Conv K-means";
+        
+        self.layers=layers;
+        
+    def get_layer(self):
+        """Get trained convolution layer
+        """
+        return self.layers[0];
+    
+    def fprop(self, X):
+        """Get activation map
+        
+        Parameters
+        ----------
+        X : matrix or 4D tensor
+            input samples, the size is (number of cases, in_dim)
+            
+        Returns
+        -------
+        out : list
+            output list from each layer
+        """
+        
+        out=[];
+        level_out=X;
+        for k, layer in enumerate(self.layers):
+            level_out=layer.apply(level_out);
+            out.append(level_out);
+            
+        return out;
+        

@@ -7,6 +7,7 @@ ConvNet base layer and extended layer
 import numpy as np;
 
 import theano;
+import theano.tensor as T;
 from theano.tensor.signal import downsample;
 from theano.tensor.nnet import conv;
 
@@ -200,7 +201,7 @@ class MaxPooling(object):
         Returns
         -------
         pooled : 4D tensor
-            max pooled out result
+            pooled out features
         """
         
         ## Check if have bleeding edge support
@@ -234,6 +235,11 @@ class MaxPoolingSameSize(object):
         ----------
         X : 4D tensor
             Max pooling will be done over the 2 last dimensions.
+            
+        Returns
+        -------
+        pooled : 4D tensor
+            Pooled feature maps
         """
         
         if theano.__version__=="0.7.0":
@@ -241,6 +247,39 @@ class MaxPoolingSameSize(object):
                                  % (theano.__version__));
         
         return downsample.max_pool_2d_same_size(X, self.pool_size);
+    
+class ArgMaxPooling(object):
+    """Perform Argmax operation to a 4D tensor"""
+    
+    def __init__(self, relex_level=1.):
+        """Init a argmax operation
+        
+        Parameters
+        ----------
+        relex_level : float
+            relex level for argmax operation
+        """
+        self.relex_level=relex_level;
+    
+    def apply(self, X):
+        """Apply argmax on 4D tensor
+        
+        Parameters
+        ----------
+        X : 4D tensor
+            Max pooling will be done over the 2 last dimensions.
+            
+        Returns
+        -------
+        pooled : 4D tensor
+            Pooled feature maps
+        """
+        
+        return T.cast(T.ge(X,
+                           self.relex_level*T.max(X,
+                                                  axis=(1),
+                                                  keepdims=True)),
+                      dtype="float32");
         
 class Flattener(object):
     """Flatten feature maps"""
