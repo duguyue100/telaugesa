@@ -1,0 +1,7 @@
+# Travis-CI testing config
+
+language: python
+python:
+  - "2.7"
+
+# Install dependencies
