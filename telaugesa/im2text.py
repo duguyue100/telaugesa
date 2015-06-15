@@ -36,11 +36,11 @@ class Im2TextDataProvider(object):
     
         print "[MESSAGE] Loading the dataset"    
         self.feature=scipy.io.loadmat(self.feature_name)["feats"].T;
-        self.description=json.load(open(self.description_name, 'r'));
+        self.desc_struct=json.load(open(self.description_name, 'r'));
         
-        self.split=defaultdict(list);
-        for img in self.description["images"]:
-            self.split[img["split"]].append[img];
+        self.desc=defaultdict(list);
+        for img in self.desc_struct["images"]:
+            self.desc[img["split"]].append(img);
             
         print "[MESSAGE] The dataset is loaded"
     

@@ -7,15 +7,9 @@ from collections import defaultdict;
 import theano;
 import theano.tensor as T;
 
-import telaugesa.datasets as ds;
+from telaugesa.im2text import Im2TextDataProvider;
 
-data=ds.load_mat("../data/flickr8k/vgg_feats.mat").T;
-des=ds.load_json("../data/flickr8k/dataset.json");
-
-split=defaultdict(list);
-
-for img in des['images']:
-    split[img['split']].append(img);
-    
-print split['train'][0]['sentids']; 
-
+data=Im2TextDataProvider(feature_name="../data/coco/vgg_feats.mat",
+                         description_name="../data/coco/dataset.json");
+                         
+print len(data.desc)
