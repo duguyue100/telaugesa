@@ -14,4 +14,5 @@ __all__=["layer",
          "train",
          "util",
          "nnfuns",
-         "dataset"]
+         "dataset",
+         "im2text"]

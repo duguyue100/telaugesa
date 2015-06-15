@@ -17,5 +17,5 @@ split=defaultdict(list);
 for img in des['images']:
     split[img['split']].append(img);
     
-print split['val'][0]; 
+print split['train'][0]['sentids']; 
 

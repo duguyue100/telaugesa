@@ -123,35 +123,3 @@ def load_CIFAR10(ROOT):
     Xte, Yte=load_CIFAR_batch(os.path.join(ROOT, "test_batch"));
     
     return Xtr, Ytr, Xte, Yte;
-
-def load_mat(filepath):
-    """Load MatLab file, usually it's pre-trained image features from ConvNet
-    
-    Parameters
-    ----------
-    filepath : string
-        destination folder of the data
-        
-    Returns
-    -------
-    mat : matrix
-        loaded matrix
-    """
-    
-    return scipy.io.loadmat(filepath)["feats"];
-
-def load_json(filepath):
-    """Load Json file
-    
-    Parameters
-    ----------
-    filepath : string
-        destination folder of the data
-        
-    Returns
-    -------
-    data : structure
-        json structured data
-    """
-    
-    return json.load(open(filepath, 'r'));
