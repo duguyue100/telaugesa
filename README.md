@@ -1,5 +1,7 @@
 # Telauges Alpha
 
+__Currently, Max-pooling has some issues with cuDNN support, please use basic useage only__
+
 I finally decided to rewrite my coding style for neural networks. This code will be eventually merged to Telauges.
 
 This code is heavily referred to three deep learning library
