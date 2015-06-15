@@ -54,6 +54,34 @@ General requirements can be achieved by `Anaconda`. More specifically, you need:
    + Auto-encoder Model [TODO]
    + Convolutional Auto-encoder Model [TODO]
    + Mixed Layer Model [TODO]
+   
+## Notes
+
+### NeuralTalk
+
+I'm trying to reproduce the result of [Deep Visual-Semantic Alignments for Generating Image Descriptions](http://cs.stanford.edu/people/karpathy/deepimagesent/).
+
+Here is some of my notes while playing with the dataset. There are descriptions of three datasets are available:
++ Flickr8k
++ Flickr30k
++ Microsoft COCO
+
+The description file `dataset.json` is organized in this way (just a raw description). For each image
+```
+ -- image info
+    |
+    -- filename (string)
+    -- imgid (int)
+    -- sentences (dict)
+       |
+       -- tokens (dict, in order)
+       -- raw (raw sentence)
+       -- imgid (int, image that associates with the description)
+       -- sentid (int, label of sentence)
+       ...
+    -- split (string, "train", "val", or "test")
+    -- sentids (dict)
+```
 
 ## Contacts
 
