@@ -45,7 +45,7 @@ def binary_cross_entropy_cost(Y_hat, Y_star):
         cost of binary cross entropy cost
     """
     
-    return T.nnet.binary_crossentropy(Y_hat, Y_star).mean();
+    return T.sum(T.nnet.binary_crossentropy(Y_hat, Y_star), axis=1).mean();
 
 def categorical_cross_entropy_cost(Y_hat, Y_star):
     """Categorical Cross Entropy Cost

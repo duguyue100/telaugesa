@@ -51,7 +51,7 @@ General requirements can be achieved by `Anaconda`. More specifically, you need:
 
 + Model
    + Feedforward Model
-   + Auto-encoder Model [TODO]
+   + Auto-encoder Model
    + Convolutional Auto-encoder Model [TODO]
    + Mixed Layer Model [TODO]
    
