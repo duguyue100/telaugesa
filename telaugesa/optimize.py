@@ -8,6 +8,7 @@ Supported methods:
 + Adagrad
 + Adadelta
 + RMSprop
++ Adam
 """
 
 from collections import OrderedDict;
@@ -20,7 +21,7 @@ import theano.tensor as T;
 def sgd(cost,
         params,
         updates=None,
-        learning_rate=0.1):
+        learning_rate=0.001):
     """Stochastic Gradient Descent (SGD)
     
     Parameters
@@ -82,7 +83,7 @@ def apply_momentum(updates,
 
 def apply_nestrov_momentum(updates,
                            params,
-                           momentum=None):
+                           momentum=0.):
     """Apply Nestrov momentum to update updates dictionary
     
     Parameters
@@ -115,7 +116,7 @@ def apply_nestrov_momentum(updates,
 def adagrad(cost,
             params,
             updates=None,
-            learning_rate=0.1,
+            learning_rate=0.001,
             eps=1e-6):
     """Adagrad
     
@@ -155,7 +156,7 @@ def adagrad(cost,
 def adadelta(cost,
              params,
              updates=None,
-             learning_rate=0.1,
+             learning_rate=0.001,
              eps=1e-6,
              rho=0.95):
     """Adadelta
@@ -206,9 +207,9 @@ def adadelta(cost,
 def rmsprop(cost,
             params,
             updates=None,
-            learning_rate=0.1,
+            learning_rate=0.001,
             eps=1e-6,
-            rho=0.95):
+            rho=0.9):
     """RMSprop
     
     Parameters
@@ -240,10 +241,65 @@ def rmsprop(cost,
         accu=theano.shared(np.zeros(value.shape, dtype=value.dtype),
                            broadcastable=param.broadcastable);
                            
-        accu_new=rho*accu+(1-rho)*gparam**2;
+        accu_new=rho*accu+(1-rho)*T.sqr(gparam);
         updates[accu]=accu_new;
         updates[param]=param-(learning_rate*gparam/T.sqrt(accu_new+eps));
         
+    return updates;
+
+def adam(cost,
+         params,
+         updates=None,
+         learning_rate=0.001,
+         beta_1=0.9,
+         beta_2=0.999,
+         eps=1e-8):
+    """Adam
+    
+    Parameters
+    ----------
+    cost : scalar
+        total cost of the cost function.
+    params : list
+        parameter list
+    learning_rate : float
+        learning rate of SGD
+    beta_1 : float
+        Exponential decay rate for the first moment estimates.
+    beta_2 : float
+        Exponential decay rate for the second moment estimates.
+    eps : float
+        Small value added for numerical stability
+        
+    Returns
+    -------
+    updates : OrderedDict
+        list of updated parameters
+    """
+    
+    if updates==None:
+        updates=OrderedDict();
+        
+    gparams=T.grad(cost, params);
+    
+    t_prev=theano.shared(np.asarray(0, dtype="float32"));
+    for param, gparam in zip(params, gparams):
+        m_prev = theano.shared(param.get_value() * 0.);
+        v_prev = theano.shared(param.get_value() * 0.);
+        
+        t=t_prev+1;
+        
+        m_t = beta_1*m_prev + (1-beta_1)*gparam;
+        v_t = beta_2*v_prev + (1-beta_2)*gparam**2;
+        
+        a_t = learning_rate*T.sqrt(1-beta_2**t)/(1-beta_1**t);
+        step = a_t*m_t/(T.sqrt(v_t) + eps);
+        
+        updates[m_prev] = m_t;
+        updates[v_prev] = v_t;
+        updates[param] = param - step;
+        
+    updates[t_prev] = t
     return updates;
 
 def gd_updates(cost,
@@ -251,10 +307,11 @@ def gd_updates(cost,
                updates=None,
                momentum=None,
                nesterov=False,
-               max_norm=5.0,
-               learning_rate=0.1,
+               learning_rate=0.001,
                eps=1e-6,
                rho=0.95,
+               beta_1=0.9,
+               beta_2=0.999,
                method="sgd"):
     """Gradient Descent based optimization
     
@@ -289,6 +346,8 @@ def gd_updates(cost,
                 updates=apply_momentum(updates, params, momentum=momentum);
     elif method=="rmsprop":
         updates=rmsprop(cost, params, updates, learning_rate=learning_rate, eps=eps, rho=rho);
+    elif method=="adam":
+        updates=adam(cost, params, updates, learning_rate=learning_rate, beta_1=beta_1, beta_2=beta_2, eps=eps);
     else:
         raise ValueError("Method %s is not a valid choice" % method);
             

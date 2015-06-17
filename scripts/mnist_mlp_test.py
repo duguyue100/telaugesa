@@ -42,7 +42,7 @@ model=FeedForward(layers=[layer_0, layer_1, layer_2]);
                   
 out=model.fprop(X);
 cost=categorical_cross_entropy_cost(out[-1], y);
-updates=gd_updates(cost=cost, params=model.params, method="adagrad");
+updates=gd_updates(cost=cost, params=model.params, method="rmsprop", rho=0.9, learning_rate=0.001);
 
 train=theano.function(inputs=[idx],
                       outputs=cost,
