@@ -62,10 +62,10 @@ layer_3=SoftmaxLayer(in_dim=200,
                      out_dim=10);
                      
 #dropout=multi_dropout([(batch_size, 1, 28, 28), None, (batch_size, 50, 11, 11), None, None, None, None], prob=0.5);
-dropout=multi_dropout([None, None, None, None, None, None, None], prob=0.5);
+dropout=multi_dropout([(batch_size, 1, 28, 28), None, (batch_size, 50, 11, 11), None, None, None, None], prob=0.5);
                      
 model=FeedForward(layers=[layer_0, pool_0, layer_1, pool_1, flattener, layer_2, layer_3],
-                  dropout=None);
+                  dropout=dropout);
 
 out=model.fprop(images);
 cost=categorical_cross_entropy_cost(out[-1], y)+L2_regularization(model.params, 0.01);

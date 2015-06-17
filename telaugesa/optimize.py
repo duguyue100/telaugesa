@@ -371,8 +371,14 @@ def dropout(shape, prob=0.):
         dropout mask
     """
     
-    mask=theano_rng.binomial(n=1, p=1-prob, size=shape);
-    return T.cast(x=mask, dtype="float32");
+    if shape is not None:
+        if prob==1.:
+            mask=theano_rng.binomial(n=1, p=1-prob, size=shape);
+        else:
+            mask=theano_rng.binomial(n=1, p=1-prob, size=shape)/(1. - prob);
+        return T.cast(x=mask, dtype="float32");
+    else:
+        return None;
 
 def multi_dropout(shapes, prob=0.):
     """generate a list of dropout mask
