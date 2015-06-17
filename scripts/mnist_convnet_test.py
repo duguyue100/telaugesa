@@ -64,7 +64,7 @@ model=FeedForward(layers=[layer_0, pool_0, layer_1, pool_1, flattener, layer_2, 
 
 out=model.fprop(images);
 cost=categorical_cross_entropy_cost(out[-1], y)+L2_regularization(model.params, 0.01);
-updates=gd_updates(cost=cost, params=model.params);
+updates=gd_updates(cost=cost, params=model.params, momentum=0.9);
 
 train=theano.function(inputs=[idx],
                       outputs=cost,

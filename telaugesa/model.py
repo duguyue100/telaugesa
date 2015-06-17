@@ -124,6 +124,24 @@ class AutoEncoder(object):
     @property
     def params(self):
         return [param for layer in self.layers if hasattr(layer, 'params') for param in layer.params];
+    
+class ConvAutoEncoder(object):
+    """Convolutional Auto-Encoder model"""
+    def __init__(self, layers):
+        """Initialize ConvAE
+        
+        Parameters
+        ----------
+        layers : tuple
+            list of feedforward layers
+        """
+        
+        self.layers=layers;
+        
+    def check(self):
+        """Checking the validity of a ConvAutoEncoder"""
+        
+        
                 
 class ConvKMeans(object):
     """Convolutional K-means"""

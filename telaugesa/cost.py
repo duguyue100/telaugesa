@@ -7,6 +7,7 @@ This module implements several general cost functions
 + Binary Cross Entropy cost
 + L1 regularization
 + L2 regularization
++ KL divergence
 """
 
 import theano.tensor as T;
@@ -108,3 +109,17 @@ def L2_regularization(params, L2_rate=0.):
         cost+=T.sum(param**2);
     
     return L2_rate*cost;
+
+def kl_divergence(p, p_hat):
+    """Compute KL divergence
+    
+    Parameter
+    ---------
+    p : float
+        sparsity parameter
+    p_hat : float
+        average activation of a hidden neuron
+    """
+    
+    return p_hat-p+p*T.log(p/p_hat);
+

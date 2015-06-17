@@ -113,6 +113,11 @@ class ConvNetBase(object):
         
         return Y;
     
+    def get_dim(self):
+        """Get dimensions for feature map and filter
+        """
+        pass
+    
     @property    
     def params(self):
         return (self.filters, self.bias);

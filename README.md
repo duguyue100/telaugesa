@@ -44,9 +44,9 @@ General requirements can be achieved by `Anaconda`. More specifically, you need:
    + Gated Recurrent Net [TODO]
 
 + Training Algorithm
-   + Stochastic gradient descent (SGD)
-   + Adagrad [TODO]
-   + Adadelta [TODO]
+   + Stochastic gradient descent (SGD) (Momentum and Nestrov Momentum)
+   + Adagrad
+   + Adadelta
    + Dropout [TODO]
 
 + Model
