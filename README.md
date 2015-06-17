@@ -47,7 +47,7 @@ General requirements can be achieved by `Anaconda`. More specifically, you need:
    + Stochastic gradient descent (SGD) (Momentum and Nestrov Momentum)
    + Adagrad
    + Adadelta
-   + RMSprop (Sugeest config: `learning_rate=0.001`, `eps=1e-6`, `rho=0.9`
+   + RMSprop (Sugeest config: `learning_rate=0.001`, `eps=1e-6`, `rho=0.9`)
    + Adam
    + Dropout [TODO]
 

@@ -42,7 +42,15 @@ model=FeedForward(layers=[layer_0, layer_1, layer_2]);
                   
 out=model.fprop(X);
 cost=categorical_cross_entropy_cost(out[-1], y);
-updates=gd_updates(cost=cost, params=model.params, method="rmsprop", rho=0.9, learning_rate=0.001);
+
+# Configurations that work
+#updates=gd_updates(cost=cost, params=model.params, method="sgd", learning_rate=0.1);
+#updates=gd_updates(cost=cost, params=model.params, method="sgd", learning_rate=0.1, momentum=0.9);
+#updates=gd_updates(cost=cost, params=model.params, method="sgd", learning_rate=0.1, momentum=0.9, nesterov=True);
+#updates=gd_updates(cost=cost, params=model.params, method="adagrad", learning_rate=0.001);
+#updates=gd_updates(cost=cost, params=model.params, method="adadelta", learning_rate=0.1, rho=0.9, eps=1e-6);
+#updates=gd_updates(cost=cost, params=model.params, method="rmsprop", learning_rate=0.001, rho=0.9, eps=1e-6);
+updates=gd_updates(cost=cost, params=model.params, method="adam", learning_rate=0.001, eps=1e-8);
 
 train=theano.function(inputs=[idx],
                       outputs=cost,
