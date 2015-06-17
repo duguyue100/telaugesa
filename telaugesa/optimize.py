@@ -381,7 +381,7 @@ def multi_dropout(shapes, prob=0.):
     ----------
     shapes : tuple of tuples
         list of shapes of dropout masks
-    prob : double
+    prob : float
         probability of each sample
     
     Returns
@@ -389,7 +389,7 @@ def multi_dropout(shapes, prob=0.):
     masks : tuple of tensors
         list of dropout masks
     """
-    return [dropout(shape, dropout) for shape in shapes];
+    return [dropout(shape, prob) for shape in shapes];
 
 def apply_dropout(X, mask=None):
     """apply dropout operation

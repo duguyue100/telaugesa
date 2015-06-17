@@ -11,6 +11,7 @@ from telaugesa.fflayers import ReLULayer;
 from telaugesa.fflayers import SoftmaxLayer;
 from telaugesa.model import FeedForward;
 from telaugesa.optimize import gd_updates;
+from telaugesa.optimize import multi_dropout;
 from telaugesa.cost import categorical_cross_entropy_cost;
 
 n_epochs=100;
@@ -37,20 +38,22 @@ layer_1=ReLULayer(in_dim=500,
                   out_dim=200);
 layer_2=SoftmaxLayer(in_dim=200,
                      out_dim=10);
+                     
+dropout=multi_dropout([(batch_size, 784), (batch_size, 500), (batch_size, 200)], 0.5);
                                           
-model=FeedForward(layers=[layer_0, layer_1, layer_2]);
+model=FeedForward(layers=[layer_0, layer_1, layer_2], dropout=dropout);
                   
 out=model.fprop(X);
 cost=categorical_cross_entropy_cost(out[-1], y);
 
 # Configurations that work
-#updates=gd_updates(cost=cost, params=model.params, method="sgd", learning_rate=0.1);
+updates=gd_updates(cost=cost, params=model.params, method="sgd", learning_rate=0.1);
 #updates=gd_updates(cost=cost, params=model.params, method="sgd", learning_rate=0.1, momentum=0.9);
 #updates=gd_updates(cost=cost, params=model.params, method="sgd", learning_rate=0.1, momentum=0.9, nesterov=True);
 #updates=gd_updates(cost=cost, params=model.params, method="adagrad", learning_rate=0.001);
 #updates=gd_updates(cost=cost, params=model.params, method="adadelta", learning_rate=0.1, rho=0.9, eps=1e-6);
 #updates=gd_updates(cost=cost, params=model.params, method="rmsprop", learning_rate=0.001, rho=0.9, eps=1e-6);
-updates=gd_updates(cost=cost, params=model.params, method="adam", learning_rate=0.001, eps=1e-8);
+#updates=gd_updates(cost=cost, params=model.params, method="adam", learning_rate=0.001, eps=1e-8);
 
 train=theano.function(inputs=[idx],
                       outputs=cost,

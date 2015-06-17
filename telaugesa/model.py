@@ -6,12 +6,14 @@ This module documented some training models
 """
 
 from telaugesa.optimize import corrupt_input;
+from telaugesa.optimize import apply_dropout;
 
 class FeedForward(object):
     """Feedforward Neural Network model"""
     
     def __init__(self,
-                 layers=None):
+                 layers=None,
+                 dropout=None):
         """Initialize feedforward model
         
         Parameters
@@ -20,8 +22,14 @@ class FeedForward(object):
             number of input size
         layers : list
             list of layers
+        drouput : list
+            list of dropout mask
         """
         self.layers=layers;
+        if dropout is None:
+            self.dropout=[];
+        else:
+            self.dropout=dropout;
         
     def fprop(self,
               X):
@@ -41,6 +49,8 @@ class FeedForward(object):
         out=[];
         level_out=X;
         for k, layer in enumerate(self.layers):
+            if len(self.dropout)>0:
+                level_out=apply_dropout(level_out, self.dropout[k]);
             
             level_out=layer.apply(level_out);
             

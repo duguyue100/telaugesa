@@ -13,6 +13,7 @@ from telaugesa.convnet import MaxPooling;
 from telaugesa.convnet import Flattener;
 from telaugesa.model import FeedForward;
 from telaugesa.optimize import gd_updates;
+from telaugesa.optimize import multi_dropout;
 from telaugesa.cost import categorical_cross_entropy_cost;
 from telaugesa.cost import L2_regularization;
 
@@ -60,11 +61,15 @@ layer_2=ReLULayer(in_dim=320,
 layer_3=SoftmaxLayer(in_dim=200,
                      out_dim=10);
                      
-model=FeedForward(layers=[layer_0, pool_0, layer_1, pool_1, flattener, layer_2, layer_3]);
+#dropout=multi_dropout([(batch_size, 1, 28, 28), None, (batch_size, 50, 11, 11), None, None, None, None], prob=0.5);
+dropout=multi_dropout([None, None, None, None, None, None, None], prob=0.5);
+                     
+model=FeedForward(layers=[layer_0, pool_0, layer_1, pool_1, flattener, layer_2, layer_3],
+                  dropout=None);
 
 out=model.fprop(images);
 cost=categorical_cross_entropy_cost(out[-1], y)+L2_regularization(model.params, 0.01);
-updates=gd_updates(cost=cost, params=model.params, method="adam", learning_rate=0.001, eps=1e-8);
+updates=gd_updates(cost=cost, params=model.params, method="sgd", learning_rate=0.1);
 
 train=theano.function(inputs=[idx],
                       outputs=cost,
