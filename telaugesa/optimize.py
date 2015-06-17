@@ -1,8 +1,13 @@
 """Optimization method
 
-Supported method:
+The methods are implemented by referencing Lasagne
 
-+ Stochastic gradient descent
+Supported methods:
+
++ Stochastic gradient descent (Momentum and Nestrov Momentum)
++ Adagrad
++ Adadelta
++ RMSprop
 """
 
 from collections import OrderedDict;
@@ -198,6 +203,49 @@ def adadelta(cost,
         
     return updates;
 
+def rmsprop(cost,
+            params,
+            updates=None,
+            learning_rate=0.1,
+            eps=1e-6,
+            rho=0.95):
+    """RMSprop
+    
+    Parameters
+    ----------
+    cost : scalar
+        total cost of the cost function.
+    params : list
+        parameter list
+    learning_rate : float
+        learning rate of SGD
+    eps : float
+        Small value added for numerical stability
+    rho : float
+        Gradient moving average decay factor
+        
+    Returns
+    -------
+    updates : OrderedDict
+        list of updated parameters
+    """
+    
+    if updates is None:
+        updates=OrderedDict();
+        
+    gparams=T.grad(cost, params);
+    
+    for param, gparam in zip(params, gparams):
+        value=param.get_value(borrow=True);
+        accu=theano.shared(np.zeros(value.shape, dtype=value.dtype),
+                           broadcastable=param.broadcastable);
+                           
+        accu_new=rho*accu+(1-rho)*gparam**2;
+        updates[accu]=accu_new;
+        updates[param]=param-(learning_rate*gparam/T.sqrt(accu_new+eps));
+        
+    return updates;
+
 def gd_updates(cost,
                params,
                updates=None,
@@ -219,7 +267,7 @@ def gd_updates(cost,
     params : list
         parameter list
     method : string
-        optimization method: "sgd", "adagrad", "adadelta"
+        optimization method: "sgd", "adagrad", "adadelta", "rmsprop"
         
     Returns
     -------
@@ -239,6 +287,10 @@ def gd_updates(cost,
                 updates=apply_nestrov_momentum(updates, params, momentum=momentum);
             else:
                 updates=apply_momentum(updates, params, momentum=momentum);
+    elif method=="rmsprop":
+        updates=rmsprop(cost, params, updates, learning_rate=learning_rate, eps=eps, rho=rho);
+    else:
+        raise ValueError("Method %s is not a valid choice" % method);
             
     return updates;
 
