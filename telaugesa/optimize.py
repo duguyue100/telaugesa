@@ -417,7 +417,7 @@ def apply_dropout(X, mask=None):
     else:
         return X;
     
-def corrupt_input(X, corruption_level=0.):
+def corrupt_input(X, corruption_level=0., noise_type="binomial"):
     """Add noise on data
     
     Parameters
@@ -425,11 +425,20 @@ def corrupt_input(X, corruption_level=0.):
     X : tensor
         data to be corrupted
     corruption_level : double
-        probability of the corruption level
+        probability of the corruption level, std if noise type is gaussian. 
+    noise_type : string
+        type of noise: "binomial" or "gaussian"
     Returns
     -------
     corrupted_out : tensor
         corrupted output 
     """
     
-    return apply_dropout(X, dropout(X.shape, corruption_level));
+    if noise_type=="binomial":
+        corrupted_out=theano_rng.binomial(size=X.shape, n=1,
+                                          p=1 - corruption_level,
+                                          dtype="float32")*X;
+    elif noise_type=="gaussian":
+        corrupted_out=theano_rng.normal(size=X.shape, std=corruption_level, dtype="float32")+X;
+    
+    return corrupted_out;
