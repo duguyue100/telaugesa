@@ -119,7 +119,6 @@ class AutoEncoder(object):
         
         if epoch is not None:
             self.corruption_level=corruption_level*(epoch**(-decay_rate));
-            #self.corruption_level=corruption_level[epoch];
         else:
             self.corruption_level=corruption_level;
         

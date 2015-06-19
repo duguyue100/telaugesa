@@ -41,7 +41,8 @@ decode_layer=SigmoidLayer(in_dim=500,
                           
 model=AutoEncoder(layers=[encode_layer, decode_layer]);
 
-out=model.fprop(X, corruption_level=corruption_level, noise_type="gaussian");
+#out=model.fprop(X, corruption_level=corruption_level, noise_type="gaussian");
+out=model.fprop(X, corruption_level=corruption_level);
 cost=binary_cross_entropy_cost(out[-1], X);
 
 updates=gd_updates(cost=cost, params=model.params, method="sgd", learning_rate=0.1);
@@ -55,7 +56,7 @@ print "[MESSAGE] The model is built"
 
 epoch = 0;
 min_cost=None;
-corr=np.random.uniform(low=0., high=0.1, size=1).astype("float32");
+corr=np.random.uniform(low=0.2, high=0.3, size=1).astype("float32");
 corr_best=corr[0]
 while (epoch < n_epochs):
     epoch = epoch + 1;
@@ -64,7 +65,7 @@ while (epoch < n_epochs):
     
     #corr=np.random.rand(1).astype("float32");
     for batch_index in xrange(n_train_batches):
-        train_cost=train(batch_index, 0.5)
+        train_cost=train(batch_index, corr_best)
         c.append(train_cost);
         #co.append(curr_corr);
         
@@ -74,9 +75,9 @@ while (epoch < n_epochs):
         if (np.mean(c)<min_cost):
             min_cost=np.mean(c);
             corr_best=corr[0]
-            corr=np.random.uniform(low=corr_best, high=corr_best+0.2, size=1).astype("float32");
+            corr=np.random.uniform(low=corr_best, high=corr_best+0.15, size=1).astype("float32");
         else:
-            corr=np.random.uniform(low=corr_best, high=corr_best+0.2, size=1).astype("float32");
+            corr=np.random.uniform(low=corr_best, high=corr_best+0.15, size=1).astype("float32");
 
     print 'Training epoch %d, cost ' % epoch, np.mean(c), corr_best;
     
