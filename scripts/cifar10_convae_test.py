@@ -1,4 +1,4 @@
-"""Conv AE test on MNIST"""
+"""Conv AE test on CIFAR-10"""
 
 import numpy as np;
 import matplotlib.pyplot as plt;
