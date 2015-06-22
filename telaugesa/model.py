@@ -85,7 +85,7 @@ class AutoEncoder(object):
         """Check the validity of an AutoEncoder
         """
         
-        assert self.layers[0].in_dim==self.layers[-1].out_dim, \
+        assert self.layers[0].get_dim("input")==self.layers[-1].get_dim("output"), \
             "Input dimension is not match to output dimension";
            
         for layer in self.layers:
@@ -150,11 +150,60 @@ class ConvAutoEncoder(object):
         """
         
         self.layers=layers;
+        self.check();
         
     def check(self):
         """Checking the validity of a ConvAutoEncoder"""
         
+        assert self.layers[0].get_dim("input")==self.layers[-1].get_dim("output"), \
+            "Input dimension is not match to output dimension";
         
+    def fprop(self,
+              X,
+              corruption_level=None,
+              noise_type="binomial",
+              epoch=None,
+              decay_rate=1.):
+        """Forward pass of convolutional auto-encoder
+        
+        Parameters
+        ----------
+        X : 4D tensor
+            data in (batch size, channel, height, width)
+        corruption_level : float
+            corruption_level on data
+        noise_type : string
+            type of noise: "binomial" or "gaussian"
+        
+        Returns
+        -------
+        out : 4-D tensor
+            output list for each layer
+        """
+        
+        out=[];
+        
+        if epoch is not None:
+            self.corruption_level=corruption_level*(epoch**(-decay_rate));
+        else:
+            self.corruption_level=corruption_level;
+        
+        if self.corruption_level == None:
+            level_out=X;
+        else:
+            level_out=corrupt_input(X, self.corruption_level, noise_type);
+            
+        for k, layer in enumerate(self.layers):
+            
+            level_out=layer.apply(level_out);
+            
+            out.append(level_out);
+            
+        return out;
+    
+    @property
+    def params(self):
+        return [param for layer in self.layers if hasattr(layer, 'params') for param in layer.params];
                 
 class ConvKMeans(object):
     """Convolutional K-means"""

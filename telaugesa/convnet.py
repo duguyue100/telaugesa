@@ -113,10 +113,26 @@ class ConvNetBase(object):
         
         return Y;
     
-    def get_dim(self):
+    def get_dim(self, name):
         """Get dimensions for feature map and filter
+        
+         Parameters
+        ----------
+        name : string
+            "input" or "output"
+        
+        Returns
+        -------
+        dimension : tuple
+            input or output dimension
         """
-        pass
+        
+        if name=="input":
+            return (self.num_channels,)+self.fm_size;
+        elif name=="output":
+            return ((self.num_filters,)+
+                    conv.ConvOp.getOutputShape(self.fm_size, self.filter_size,
+                                               self.step, self.border_mode));
     
     @property    
     def params(self):
@@ -177,6 +193,7 @@ class MaxPooling(object):
     def __init__(self,
                  pool_size,
                  step=None,
+                 input_dim=None,
                  mode="max",
                  **kwargs):
         """Initialize max pooling
@@ -187,12 +204,15 @@ class MaxPooling(object):
             height and width of pooling region
         step : tuple
             The vertical and horizontal shift (stride)
+        input_dim : tuple
+            Dimension of input feature maps
         mode : string
             Pooling method: "max", "sum", "average_inc_pad", "average_exc_pad"
             Max-pooling, Sum-pooling or Average-pooling
         """
         self.pool_size=pool_size;
         self.step=step;
+        self.input_dim=input_dim;
         self.mode=mode;
         
     def apply(self, X):
@@ -218,6 +238,29 @@ class MaxPooling(object):
                                  % (self.mode, theano.__version__));
         else:
             return downsample.max_pool_2d(X, self.pool_size, st=self.step, mode=self.mode);
+        
+    def get_dim(self, name):
+        """Get dimensions for feature map and filter
+        
+        (need to consider average mode?)
+        
+         Parameters
+        ----------
+        name : string
+            "input" or "output"
+        
+        Returns
+        -------
+        dimension : tuple
+            input or output dimension
+        """
+        
+        if name=="input":
+            return self.input_dim;
+        elif name=="output":
+            return tuple(downsample.DownsampleFactorMax.out_shape(self.input_dim,
+                                                                  self.pool_size,
+                                                                  st=self.step));
         
 class MaxPoolingSameSize(object):
     """Same size Max-pooling layer"""

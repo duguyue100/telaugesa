@@ -90,6 +90,25 @@ class Layer(object):
         
         return Y;
     
+    def get_dim(self, name):
+        """Get dimension
+        
+        Parameters
+        ----------
+        name : string
+            "input" or "output"
+        
+        Returns
+        -------
+        dimension : int
+            input or output dimension
+        """
+        
+        if name=="input":
+            return self.in_dim;
+        elif name=="output":
+            return self.out_dim;
+    
     @property    
     def params(self):
         return (self.W, self.bias);
