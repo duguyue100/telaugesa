@@ -5,6 +5,7 @@ import sys;
 sys.path.append("..");
 
 import numpy as np;
+import matplotlib.pyplot as plt;
 
 import theano;
 import theano.tensor as T;
@@ -45,30 +46,27 @@ idx=T.lscalar();
 images=X.reshape((batch_size, 1, 32, 32))
 
 layer_0=ReLUConvLayer(filter_size=(7,7),
-                      num_filters=50,
+                      num_filters=64,
                       num_channels=1,
                       fm_size=(32,32),
                       batch_size=batch_size);
                       
-pool_0=MaxPooling(pool_size=(2,2), step=(3,3));
-#pool_0=MaxPooling(pool_size=(2,2));
-
-#print DownsampleFactorMax.out_shape((26,26), (2,2), st=(3,3));
+pool_0=MaxPooling(pool_size=(2,2));
                       
 layer_1=ReLUConvLayer(filter_size=(4,4),
-                      num_filters=20,
-                      num_channels=50,
-                      fm_size=(9,9),
+                      num_filters=40,
+                      num_channels=64,
+                      fm_size=(13,13),
                       batch_size=batch_size);
 
 pool_1=MaxPooling(pool_size=(2,2));
 
 flattener=Flattener();
 
-layer_2=ReLULayer(in_dim=20*9,
-                  out_dim=200);
+layer_2=ReLULayer(in_dim=40*25,
+                  out_dim=800);
                   
-layer_3=SoftmaxLayer(in_dim=200,
+layer_3=SoftmaxLayer(in_dim=800,
                      out_dim=10);
                      
 model=FeedForward(layers=[layer_0, pool_0, layer_1, pool_1, flattener, layer_2, layer_3]);
@@ -106,3 +104,11 @@ while (epoch < n_epochs):
             
             print(('     epoch %i, minibatch %i/%i, test error %f %%') %
                   (epoch, minibatch_index + 1, n_train_batches, test_record[epoch-1] * 100.));
+                  
+filters=model.layers[0].filters.get_value(borrow=True);
+
+for i in xrange(64):
+    plt.subplot(8, 8, i);
+    plt.imshow(filters[i, 0, :, :], cmap = plt.get_cmap('gray'), interpolation='nearest');
+    plt.axis('off')
+plt.show();
