@@ -28,7 +28,9 @@ def mean_square_cost(Y_hat, Y_star):
         cost of mean square reconstruction cost
     """
     
-    return 0.5*T.mean(T.sum(T.pow(T.sub(Y_hat, Y_star),2), axis=1));
+    cost=T.sum(T.pow(T.sub(Y_hat, Y_star),2), axis=1);
+    
+    return 0.5*T.mean(cost);
 
 def binary_cross_entropy_cost(Y_hat, Y_star):
     """Binary Cross Entropy Cost
@@ -106,7 +108,7 @@ def L2_regularization(params, L2_rate=0.):
     
     cost=0;
     for param in params:
-        cost+=T.sum(param**2);
+        cost+=(param**2).sum();
     
     return L2_rate*cost;
 

@@ -353,7 +353,7 @@ def gd_updates(cost,
             
     return updates;
 
-theano_rng=T.shared_randomstreams.RandomStreams(1234);
+theano_rng=T.shared_randomstreams.RandomStreams(np.random.randint(2 ** 30));
 
 def dropout(shape, prob=0.):
     """generate dropout mask

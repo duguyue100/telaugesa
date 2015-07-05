@@ -9,10 +9,8 @@ This module implements the interface that loads datasets
 import os;
 import gzip;
 import cPickle as pickle;
-import json;
 
 import numpy as np;
-import scipy.io;
 
 import theano;
 import theano.tensor as T;
