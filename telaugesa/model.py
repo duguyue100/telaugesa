@@ -188,7 +188,7 @@ class ConvAutoEncoder(object):
         else:
             self.corruption_level=corruption_level;
         
-        if self.corruption_level == None:
+        if self.corruption_level is None:
             level_out=X;
         else:
             level_out=corrupt_input(X, self.corruption_level, noise_type);

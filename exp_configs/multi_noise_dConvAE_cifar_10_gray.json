@@ -1,0 +1,7 @@
+{
+	"nkerns": 100,
+	"n_epochs": 100,
+	"batch_size": 100,
+	"start_noise": 0.1,
+	"noise_step": 0.1
+}

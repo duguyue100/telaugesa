@@ -17,7 +17,7 @@ from telaugesa.optimize import gd_updates;
 from telaugesa.cost import mean_square_cost;
 from telaugesa.cost import L2_regularization;
 
-n_epochs=50;
+n_epochs=100;
 batch_size=100;
 nkerns=100;
 
@@ -59,7 +59,7 @@ layer_1=SigmoidConvLayer(filter_size=(7,7),
                          
 model=ConvAutoEncoder(layers=[layer_0, layer_1]);
 
-out=model.fprop(images, corruption_level=0.2);
+out=model.fprop(images, corruption_level=0.9);
 cost=mean_square_cost(out[-1], images)+L2_regularization(model.params, 0.005);
 
 updates=gd_updates(cost=cost, params=model.params, method="sgd", learning_rate=0.1);
