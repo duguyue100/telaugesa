@@ -59,7 +59,7 @@ layer_1=SigmoidConvLayer(filter_size=(7,7),
                          
 model=ConvAutoEncoder(layers=[layer_0, layer_1]);
 
-out=model.fprop(images, corruption_level=0.9);
+out=model.fprop(images, corruption_level=0.5);
 cost=mean_square_cost(out[-1], images)+L2_regularization(model.params, 0.005);
 
 updates=gd_updates(cost=cost, params=model.params, method="sgd", learning_rate=0.1);
@@ -83,8 +83,10 @@ while (epoch < n_epochs):
     
 filters=model.layers[0].filters.get_value(borrow=True);
 
-for i in xrange(nkerns):
-    plt.subplot(10, 10, i);
+for i in xrange(nkerns):    
+#     plt.subplot(10, 10, i);
+    image_adr="../data/dConvAE_0.5_fixed/dConvAE_0.5_fixed_%d.eps" % (i);
     plt.imshow(filters[i, 0, :, :], cmap = plt.get_cmap('gray'), interpolation='nearest');
-    plt.axis('off')
-plt.show();
+    plt.axis('off');
+    plt.savefig(image_adr , bbox_inches='tight', pad_inches=0);
+# plt.show();

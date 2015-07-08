@@ -127,7 +127,7 @@ def dconvae_experiment(nkerns,
     filters=model.layers[0].filters.get_value(borrow=True);
 
     for i in xrange(nkerns):
-        plt.subplot(10, 10, i);
+        image_adr="../data/dConvAE_multi_level/dConvAE_multi_level_%d.eps" % (i);
         plt.imshow(filters[i, 0, :, :], cmap = plt.get_cmap('gray'), interpolation='nearest');
-        plt.axis('off')
-    plt.show();
+        plt.axis('off');
+        plt.savefig(image_adr , bbox_inches='tight', pad_inches=0);

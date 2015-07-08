@@ -6,6 +6,7 @@ sys.path.append("..");
 
 import numpy as np;
 import matplotlib.pyplot as plt;
+import cPickle as pickle;
 
 import theano;
 import theano.tensor as T;
@@ -46,7 +47,7 @@ idx=T.lscalar();
 images=X.reshape((batch_size, 1, 32, 32))
 
 layer_0=ReLUConvLayer(filter_size=(7,7),
-                      num_filters=64,
+                      num_filters=100,
                       num_channels=1,
                       fm_size=(32,32),
                       batch_size=batch_size);
@@ -54,8 +55,8 @@ layer_0=ReLUConvLayer(filter_size=(7,7),
 pool_0=MaxPooling(pool_size=(2,2));
                       
 layer_1=ReLUConvLayer(filter_size=(4,4),
-                      num_filters=40,
-                      num_channels=64,
+                      num_filters=50,
+                      num_channels=100,
                       fm_size=(13,13),
                       batch_size=batch_size);
 
@@ -63,7 +64,7 @@ pool_1=MaxPooling(pool_size=(2,2));
 
 flattener=Flattener();
 
-layer_2=ReLULayer(in_dim=40*25,
+layer_2=ReLULayer(in_dim=50*25,
                   out_dim=800);
                   
 layer_3=SoftmaxLayer(in_dim=800,
@@ -107,8 +108,14 @@ while (epoch < n_epochs):
                   
 filters=model.layers[0].filters.get_value(borrow=True);
 
-for i in xrange(64):
-    plt.subplot(8, 8, i);
+pickle.dump(test_record, open("../data/ConvNet_test_errors.pkl", "w"));
+
+for i in xrange(100):
+    image_adr="../data/ConvNet_filters/ConvNet_filter_%d.eps" % (i);
     plt.imshow(filters[i, 0, :, :], cmap = plt.get_cmap('gray'), interpolation='nearest');
-    plt.axis('off')
-plt.show();
+    plt.axis('off');
+    plt.savefig(image_adr , bbox_inches='tight', pad_inches=0);
+#     plt.subplot(8, 8, i);
+#     plt.imshow(filters[i, 0, :, :], cmap = plt.get_cmap('gray'), interpolation='nearest');
+#     plt.axis('off')
+# plt.show();
