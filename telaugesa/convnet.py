@@ -101,12 +101,24 @@ class ConvNetBase(object):
         
         """
         
-        Y=conv.conv2d(input=X,
-                      filters=self.filters,
-                      image_shape=(self.batch_size, self.num_channels)+(self.fm_size),
-                      filter_shape=(self.num_filters, self.num_channels)+(self.filter_size),
-                      border_mode=self.border_mode,
-                      subsample=self.step);
+        if self.border_mode in ['valid', 'full']:
+            Y=conv.conv2d(input=X,
+                          filters=self.filters,
+                          image_shape=(self.batch_size, self.num_channels)+(self.fm_size),
+                          filter_shape=(self.num_filters, self.num_channels)+(self.filter_size),
+                          border_mode=self.border_mode,
+                          subsample=self.step);
+        elif self.border_mode=="same":
+            Y = conv.conv2d(input=X,
+                            filters=self.filters,
+                            image_shape=(self.batch_size, self.num_channels)+(self.fm_size),
+                            filter_shape=(self.num_filters, self.num_channels)+(self.filter_size),
+                            border_mode="full",
+                            subsample=self.step);
+            shift_x = (self.filter_size[0] - 1) // 2
+            shift_y = (self.filter_size[1] - 1) // 2
+            
+            Y = Y[:, :, shift_x:self.fm_size[0] + shift_x, shift_y:self.fm_size[1] + shift_y];
                       
         if self.use_bias:
             Y+=self.bias.dimshuffle('x', 0, 'x', 'x');
@@ -130,9 +142,12 @@ class ConvNetBase(object):
         if name=="input":
             return (self.num_channels,)+self.fm_size;
         elif name=="output":
-            return ((self.num_filters,)+
-                    conv.ConvOp.getOutputShape(self.fm_size, self.filter_size,
-                                               self.step, self.border_mode));
+            if self.border_mode=="same":
+                return (self.num_channels,)+self.fm_size;
+            else:
+                return ((self.num_filters,)+
+                        conv.ConvOp.getOutputShape(self.fm_size, self.filter_size,
+                                                   self.step, self.border_mode));
     
     @property    
     def params(self):

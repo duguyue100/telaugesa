@@ -48,6 +48,7 @@ print "[MESSAGE] The data is loaded"
 X=T.matrix("data");
 y=T.ivector("label");
 idx=T.lscalar();
+corruption_level=T.fscalar();
 
 images=X.reshape((batch_size, 1, 32, 32))
 layer_0_en=ReLUConvLayer(filter_size=(7,7),
@@ -65,12 +66,12 @@ layer_0_de=SigmoidConvLayer(filter_size=(7,7),
                          
 model=ConvAutoEncoder(layers=[layer_0_en, layer_0_de]);
 
-out=model.fprop(images, corruption_level=0.3);
+out=model.fprop(images, corruption_level=corruption_level);
 cost=mean_square_cost(out[-1], images)+L2_regularization(model.params, 0.005);
 
 updates=gd_updates(cost=cost, params=model.params, method="sgd", learning_rate=0.1);
 
-train=theano.function(inputs=[idx],
+train=theano.function(inputs=[idx, corruption_level],
                       outputs=[cost],
                       updates=updates,
                       givens={X: train_set_x[idx * batch_size: (idx + 1) * batch_size]});
@@ -78,14 +79,29 @@ train=theano.function(inputs=[idx],
 print "[MESSAGE] The Layer 0 model is built"
 
 epoch = 0;
+corr=np.random.uniform(low=0.1, high=0.2, size=1).astype("float32");
+min_cost=None;
+corr_best=corr[0];
+max_iter=0;
 while (epoch < n_epochs):
     epoch = epoch + 1;
     c = []
     for batch_index in xrange(n_train_batches):
-        train_cost=train(batch_index)
+        train_cost=train(batch_index, corr_best)
         c.append(train_cost);
         
-    print 'Training epoch %d, cost ' % epoch, np.mean(c);
+    if min_cost==None:
+        min_cost=np.mean(c);
+    else:
+        if (np.mean(c)<min_cost*0.5) or (max_iter>=20):
+            min_cost=np.mean(c);
+            corr_best=corr[0]
+            corr=np.random.uniform(low=corr_best, high=corr_best+0.1, size=1).astype("float32");
+            max_iter=0;
+        else:
+            max_iter+=1;
+            
+    print 'Training epoch %d, cost ' % epoch, np.mean(c), corr_best, min_cost, max_iter;
     
 print "[MESSAGE] The Lyer 0 model is trained"
 
@@ -113,12 +129,12 @@ layer_1_de=SigmoidConvLayer(filter_size=(4,4),
                              
 model_1=ConvAutoEncoder(layers=[layer_1_en, layer_1_de]);
 
-out_1=model_1.fprop(out_trans[-1], corruption_level=0.3);
+out_1=model_1.fprop(out_trans[-1], corruption_level=corruption_level);
 cost_1=mean_square_cost(out_1[-1], out_trans[-1])+L2_regularization(model_1.params, 0.005);
 
 updates=gd_updates(cost=cost_1, params=model_1.params, method="sgd", learning_rate=0.1);
 
-train_1=theano.function(inputs=[idx],
+train_1=theano.function(inputs=[idx, corruption_level],
                         outputs=[cost_1],
                         updates=updates,
                         givens={X: train_set_x[idx * batch_size: (idx + 1) * batch_size]});
@@ -126,14 +142,29 @@ train_1=theano.function(inputs=[idx],
 print "[MESSAGE] The Layer 1 model is built"
 
 epoch = 0;
+min_cost=None;
+corr=np.random.uniform(low=0.1, high=0.2, size=1).astype("float32");
+corr_best=corr[0];
+max_iter=0;
 while (epoch < n_epochs):
     epoch = epoch + 1;
     c = []
     for batch_index in xrange(n_train_batches):
-        train_cost=train_1(batch_index)
+        train_cost=train_1(batch_index, corr_best)
         c.append(train_cost);
         
-    print 'Training epoch %d, cost ' % epoch, np.mean(c);
+    if min_cost==None:
+        min_cost=np.mean(c);
+    else:
+        if (np.mean(c)<min_cost*0.5) or (max_iter>=20):
+            min_cost=np.mean(c);
+            corr_best=corr[0]
+            corr=np.random.uniform(low=corr_best, high=corr_best+0.1, size=1).astype("float32");
+            max_iter=0;
+        else:
+            max_iter+=1;
+            
+    print 'Training epoch %d, cost ' % epoch, np.mean(c), corr_best, min_cost, max_iter;
     
 print "[MESSAGE] The Lyer 1 model is trained"
 
@@ -185,10 +216,10 @@ while (epoch < n_epochs):
      
 filters=model.layers[0].filters.get_value(borrow=True);
  
-pickle.dump(test_record, open("../data/stacked_0_3_dconvae.pkl", "w"));
+pickle.dump(test_record, open("../data/stacked_improve_dconvae.pkl", "w"));
  
 for i in xrange(100):
-    image_adr="../data/stacked_0_3_dconvae/stacked_0_3_dconvae_filter_%d.eps" % (i);
+    image_adr="../data/stacked_improve_dconvae/stacked_improve_dconvae_filter_%d.eps" % (i);
     plt.imshow(filters[i, 0, :, :], cmap = plt.get_cmap('gray'), interpolation='nearest');
     plt.axis('off');
     plt.savefig(image_adr , bbox_inches='tight', pad_inches=0);

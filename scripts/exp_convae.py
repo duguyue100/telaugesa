@@ -76,14 +76,14 @@ def dconvae_experiment(nkerns,
                           num_filters=nkerns,
                           num_channels=1,
                           fm_size=(32,32),
-                          batch_size=batch_size);
+                          batch_size=batch_size,
+                          border_mode="full");
                                                   
     layer_1=SigmoidConvLayer(filter_size=(7,7),
                              num_filters=1,
                              num_channels=nkerns,
-                             fm_size=(26,26),
-                             batch_size=batch_size,
-                             border_mode="full");
+                             fm_size=(38,38),
+                             batch_size=batch_size);
                          
     model=ConvAutoEncoder(layers=[layer_0, layer_1]);
 
