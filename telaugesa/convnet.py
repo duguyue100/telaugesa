@@ -45,7 +45,7 @@ class ConvNetBase(object):
             The step (or stride) with which to slide the filters over the
             image. Defaults to (1, 1).
         border_mode : string
-            valid or full convolution : "valid", "full"
+            valid, same or full convolution : "valid", "same", "full"
         use_bias : bool
             either if use bias
         """

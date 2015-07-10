@@ -11,6 +11,8 @@ import theano.tensor as T;
 import telaugesa.datasets as ds;
 from telaugesa.convnet import ReLUConvLayer;
 from telaugesa.convnet import SigmoidConvLayer;
+from telaugesa.convnet import IdentityConvLayer;
+from telaugesa.convnet import MaxPoolingSameSize;
 from telaugesa.model import ConvAutoEncoder;
 from telaugesa.optimize import gd_updates;
 from telaugesa.cost import mean_square_cost;
@@ -51,18 +53,27 @@ def dconvae_experiment(nkerns,
         incremental steps of noises
     """
     
-    Xtr, Ytr, _, _=ds.load_CIFAR10("../data/CIFAR10");
+#     Xtr, Ytr, _, _=ds.load_CIFAR10("../data/CIFAR10");
+# 
+#     Xtr=np.mean(Xtr, 3);
+#     # Xte=np.mean(Xte, 3);
+#     Xtrain=Xtr.reshape(Xtr.shape[0], Xtr.shape[1]*Xtr.shape[2])/255.0;
+#     # Xtest=Xte.reshape(Xte.shape[0], Xte.shape[1]*Xte.shape[2])/255.0;
+# 
+#     train_set_x, _=ds.shared_dataset((Xtrain, Ytr));
+#     # test_set_x, test_set_y=ds.shared_dataset((Xtest, Yte));
+# 
+#     n_train_batches=train_set_x.get_value(borrow=True).shape[0]/batch_size;
+#     # n_test_batches=test_set_x.get_value(borrow=True).shape[0]/batch_size;
 
-    Xtr=np.mean(Xtr, 3);
-    # Xte=np.mean(Xte, 3);
-    Xtrain=Xtr.reshape(Xtr.shape[0], Xtr.shape[1]*Xtr.shape[2])/255.0;
-    # Xtest=Xte.reshape(Xte.shape[0], Xte.shape[1]*Xte.shape[2])/255.0;
-
-    train_set_x, _=ds.shared_dataset((Xtrain, Ytr));
-    # test_set_x, test_set_y=ds.shared_dataset((Xtest, Yte));
+    datasets=ds.load_mnist("../data/mnist.pkl.gz");
+    train_set_x, train_set_y = datasets[0];
+    valid_set_x, valid_set_y = datasets[1];
+    test_set_x, test_set_y = datasets[2];
 
     n_train_batches=train_set_x.get_value(borrow=True).shape[0]/batch_size;
-    # n_test_batches=test_set_x.get_value(borrow=True).shape[0]/batch_size;
+    n_valid_batches=valid_set_x.get_value(borrow=True).shape[0]/batch_size;
+    n_test_batches=test_set_x.get_value(borrow=True).shape[0]/batch_size;
 
     print "[MESSAGE] The data is loaded"
     
@@ -71,26 +82,27 @@ def dconvae_experiment(nkerns,
     idx=T.lscalar();
     corruption_level=T.fscalar();
     
-    images=X.reshape((batch_size, 1, 32, 32))
-    layer_0=ReLUConvLayer(filter_size=(7,7),
+    images=X.reshape((batch_size, 1, 28, 28))
+    layer_0=ReLUConvLayer(filter_size=(5,5),
                           num_filters=nkerns,
                           num_channels=1,
-                          fm_size=(32,32),
+                          fm_size=(28,28),
                           batch_size=batch_size,
-                          border_mode="full");
+                          border_mode="same");
                                                   
-    layer_1=SigmoidConvLayer(filter_size=(7,7),
-                             num_filters=1,
-                             num_channels=nkerns,
-                             fm_size=(38,38),
-                             batch_size=batch_size);
+    layer_1=IdentityConvLayer(filter_size=(11,11),
+                              num_filters=1,
+                              num_channels=nkerns,
+                              fm_size=(28,28),
+                              batch_size=batch_size,
+                              border_mode="same");
                          
-    model=ConvAutoEncoder(layers=[layer_0, layer_1]);
+    model=ConvAutoEncoder(layers=[layer_0, MaxPoolingSameSize((28,28)), layer_1]);
 
     out=model.fprop(images, corruption_level=corruption_level);
-    cost=mean_square_cost(out[-1], images)+L2_regularization(model.params, 0.005);
+    cost=mean_square_cost(out[-1], images)#+L2_regularization(model.params, 0.005);
     
-    updates=gd_updates(cost=cost, params=model.params, method="sgd", learning_rate=0.1);
+    updates=gd_updates(cost=cost, params=model.params, method="sgd", learning_rate=0.001, momentum=0.975);
     
     train=theano.function(inputs=[idx, corruption_level],
                       outputs=[cost],
@@ -114,7 +126,7 @@ def dconvae_experiment(nkerns,
         if min_cost==None:
             min_cost=np.mean(c);
         else:
-            if (np.mean(c)<min_cost*0.5) or (max_iter>=20):
+            if (np.mean(c)<min_cost*0.5) or (max_iter>=40):
                 min_cost=np.mean(c);
                 corr_best=corr[0]
                 corr=np.random.uniform(low=corr_best, high=corr_best+noise_step, size=1).astype("float32");
@@ -122,12 +134,12 @@ def dconvae_experiment(nkerns,
             else:
                 max_iter+=1;
             
-        print 'Training epoch %d, cost ' % epoch, np.mean(c), corr_best, min_cost, max_iter;
+        print 'Training epoch %d, cost %f, min cost %f, curr best %f, curr iter %d' % (epoch, np.mean(c), min_cost, corr_best, max_iter);
     
-    filters=model.layers[0].filters.get_value(borrow=True);
+    filters=model.layers[-1].filters.get_value(borrow=True);
 
     for i in xrange(nkerns):
         image_adr="../data/dConvAE_multi_level/dConvAE_multi_level_%d.eps" % (i);
-        plt.imshow(filters[i, 0, :, :], cmap = plt.get_cmap('gray'), interpolation='nearest');
+        plt.imshow(filters[0, i, :, :], cmap = plt.get_cmap('gray'), interpolation='nearest');
         plt.axis('off');
         plt.savefig(image_adr , bbox_inches='tight', pad_inches=0);
