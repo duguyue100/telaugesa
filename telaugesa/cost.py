@@ -28,9 +28,10 @@ def mean_square_cost(Y_hat, Y_star):
         cost of mean square reconstruction cost
     """
     
-    cost=T.sum(T.pow(T.sub(Y_hat, Y_star),2), axis=1);
+    #cost=T.sum(T.pow(T.sub(Y_hat, Y_star),2), axis=1);
     
-    return 0.5*T.mean(cost);
+    #return 0.5*T.mean(cost);
+    return T.mean((Y_hat - Y_star) ** 2);
 
 def binary_cross_entropy_cost(Y_hat, Y_star):
     """Binary Cross Entropy Cost

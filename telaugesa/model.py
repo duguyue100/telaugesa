@@ -154,9 +154,10 @@ class ConvAutoEncoder(object):
         
     def check(self):
         """Checking the validity of a ConvAutoEncoder"""
+        pass
         
-        assert self.layers[0].get_dim("input")==self.layers[-1].get_dim("output"), \
-            "Input dimension is not match to output dimension";
+#         assert self.layers[0].get_dim("input")==self.layers[-1].get_dim("output"), \
+#             "Input dimension is not match to output dimension";
         
     def fprop(self,
               X,
