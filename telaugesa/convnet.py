@@ -10,6 +10,7 @@ import theano;
 import theano.tensor as T;
 from theano.tensor.signal import downsample;
 from theano.tensor.nnet import conv;
+from theano.sandbox.cuda.dnn import dnn_conv;
 
 import telaugesa.util as util;
 import telaugesa.nnfuns as nnfuns;
@@ -74,13 +75,13 @@ class ConvNetBase(object):
         
         # should have better implementation for convnet weights
         
-        fan_in = self.num_channels*np.prod(self.filter_size);
-        fan_out = self.num_filters*np.prod(self.filter_size);
-        
-        filter_bound=np.sqrt(6./(fan_in + fan_out));
+#         fan_in = self.num_channels*np.prod(self.filter_size);
+#         fan_out = self.num_filters*np.prod(self.filter_size);
+#         
+#         filter_bound=np.sqrt(6./(fan_in + fan_out));
         filter_shape=(self.num_filters, self.num_channels)+(self.filter_size);
-        self.filters = theano.shared(np.asarray(np.random.uniform(low=-filter_bound,
-                                                                  high=filter_bound,
+        self.filters = theano.shared(np.asarray(np.random.uniform(low=-0.001,
+                                                                  high=0.001,
                                                                   size=filter_shape),
                                                 dtype='float32'),
                                      borrow=True);
@@ -119,7 +120,15 @@ class ConvNetBase(object):
             shift_y = (self.filter_size[1] - 1) // 2
             
             Y = Y[:, :, shift_x:self.fm_size[0] + shift_x, shift_y:self.fm_size[1] + shift_y];
-                      
+        elif self.border_mode=="same_padding":
+            shift_x = (self.filter_size[0] - 1) // 2;
+            shift_y = (self.filter_size[1] - 1) // 2;
+            Y= dnn_conv(img=X,
+                        kerns=self.filters,
+                        border_mode=(shift_x, shift_y),
+                        subsample=self.step);
+                                  
+            
         if self.use_bias:
             Y+=self.bias.dimshuffle('x', 0, 'x', 'x');
         
@@ -142,8 +151,8 @@ class ConvNetBase(object):
         if name=="input":
             return (self.num_channels,)+self.fm_size;
         elif name=="output":
-            if self.border_mode=="same":
-                return (self.num_channels,)+self.fm_size;
+            if self.border_mode in ["same", "same_padding"]:
+                return (self.num_filters,)+self.fm_size;
             else:
                 return ((self.num_filters,)+
                         conv.ConvOp.getOutputShape(self.fm_size, self.filter_size,

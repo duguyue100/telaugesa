@@ -126,10 +126,10 @@ def dconvae_experiment(nkerns,
         if min_cost==None:
             min_cost=np.mean(c);
         else:
-            if (np.mean(c)<min_cost*0.5) or (max_iter>=40):
+            if (np.mean(c)<min_cost*0.5) or (max_iter>=30):
                 min_cost=np.mean(c);
-                corr_best=corr[0]
                 corr=np.random.uniform(low=corr_best, high=corr_best+noise_step, size=1).astype("float32");
+                corr_best=corr[0]
                 max_iter=0;
             else:
                 max_iter+=1;

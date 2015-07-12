@@ -10,6 +10,7 @@ import os;
 import gzip;
 import cPickle as pickle;
 
+import csv
 import numpy as np;
 
 import theano;
@@ -121,3 +122,63 @@ def load_CIFAR10(ROOT):
     Xte, Yte=load_CIFAR_batch(os.path.join(ROOT, "test_batch"));
     
     return Xtr, Ytr, Xte, Yte;
+
+def load_fer_2013(filename, expect_labels=True):
+    """Load Facial Expression Recognition dataset
+    
+    Parameters
+    ----------
+    filename : string
+        path of the dataset file
+    expect_labels: bool
+        if load label
+        
+    Returns
+    -------
+    X : array
+        images in (number of images, dimension of image)
+    Y : array
+        label of images
+    """
+    
+    X_path = filename[:-4] + '.X.npy'
+    Y_path = filename[:-4] + '.Y.npy'
+    if os.path.exists(X_path):
+        X = np.load(X_path)
+        if expect_labels:
+            y = np.load(Y_path)
+        else:
+            y = None
+        return X, y
+    
+    csv_file = open(filename, 'r');
+    reader = csv.reader(csv_file);
+    
+    row = reader.next()
+    
+    y_list = [];
+    X_list = [];
+    
+    for row in reader:
+        if expect_labels:
+            y_str=row[0];
+            X_row_str = row[1];
+            y = int(y_str)
+            y_list.append(y)
+        else:
+            X_row_str ,= row
+        X_row_strs = X_row_str.split(' ')
+        X_row = map(lambda x: float(x), X_row_strs)
+        X_list.append(X_row)
+
+    X = np.asarray(X_list).astype('float32')
+    if expect_labels:
+        y = np.asarray(y_list)
+    else:
+        y = None
+
+    np.save(X_path, X)
+    if y is not None:
+        np.save(Y_path, y)
+    
+    return X, y;
