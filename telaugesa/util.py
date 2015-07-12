@@ -5,6 +5,23 @@ import numpy as np;
 
 import theano;
 
+def shared_floatx(value, name=None, borrow=True, dtype=None):
+    
+    if dtype is None:
+        dtype="float32";
+    
+    return theano.shared(theano._asarray(value, dtype=dtype),
+                         name=name,
+                         borrow=borrow);
+                         
+def shared_floatx_nans(shape, **kwargs):
+    
+    return shared_floatx(np.nan*np.zeros(shape), **kwargs);
+
+def shared_floatx_zeros(shape, **kwargs):
+    
+    return shared_floatx(np.zeros(shape), **kwargs);
+
 def init_weights(name,
                  out_dim,
                  in_dim=None,
