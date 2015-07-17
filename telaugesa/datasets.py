@@ -92,6 +92,34 @@ def load_CIFAR_batch(filename):
         Y=np.array(Y);
         
         return X, Y;
+    
+def load_CIFAR10_Processed(train_set,
+                           train_set_label,
+                           test_set,
+                           test_set_label):
+    """Load CIFAR-10 Processed image
+    
+    Parameters
+    ----------
+    train_set : string
+        path to train_set
+    test_set : string
+        path to test_set
+        
+    Returns
+    -------
+    Xtr : object
+        training data
+    Xte : object
+        testing data
+    """
+    
+    Xtr=np.load(open(train_set, 'r'));
+    Ytr=pickle.load(open(train_set_label, 'r')).y;
+    Xte=np.load(open(test_set, 'r'));
+    Yte=pickle.load(open(test_set_label, 'r')).y;
+    
+    return Xtr, Ytr, Xte, Yte;
         
         
 def load_CIFAR10(ROOT):

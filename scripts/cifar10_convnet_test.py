@@ -47,24 +47,26 @@ idx=T.lscalar();
 images=X.reshape((batch_size, 1, 32, 32))
 
 layer_0=ReLUConvLayer(filter_size=(7,7),
-                      num_filters=100,
+                      num_filters=64,
                       num_channels=1,
                       fm_size=(32,32),
-                      batch_size=batch_size);
+                      batch_size=batch_size,
+                      border_mode="same");
                       
 pool_0=MaxPooling(pool_size=(2,2));
                       
 layer_1=ReLUConvLayer(filter_size=(4,4),
-                      num_filters=50,
-                      num_channels=100,
-                      fm_size=(13,13),
-                      batch_size=batch_size);
+                      num_filters=32,
+                      num_channels=64,
+                      fm_size=(16,16),
+                      batch_size=batch_size,
+                      border_mode="same");
 
 pool_1=MaxPooling(pool_size=(2,2));
 
 flattener=Flattener();
 
-layer_2=ReLULayer(in_dim=50*25,
+layer_2=ReLULayer(in_dim=32*64,
                   out_dim=800);
                   
 layer_3=SoftmaxLayer(in_dim=800,
@@ -74,7 +76,7 @@ model=FeedForward(layers=[layer_0, pool_0, layer_1, pool_1, flattener, layer_2, 
 
 out=model.fprop(images);
 cost=categorical_cross_entropy_cost(out[-1], y);
-updates=gd_updates(cost=cost, params=model.params, method="sgd", learning_rate=0.1);
+updates=gd_updates(cost=cost, params=model.params, method="sgd", learning_rate=0.01, momentum=0.9);
 
 train=theano.function(inputs=[idx],
                       outputs=cost,

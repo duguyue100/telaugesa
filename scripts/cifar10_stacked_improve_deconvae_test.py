@@ -15,6 +15,7 @@ from telaugesa.fflayers import ReLULayer;
 from telaugesa.fflayers import SoftmaxLayer;
 from telaugesa.convnet import ReLUConvLayer;
 from telaugesa.convnet import SigmoidConvLayer;
+from telaugesa.convnet import IdentityConvLayer;
 from telaugesa.model import ConvAutoEncoder;
 from telaugesa.convnet import MaxPooling;
 from telaugesa.convnet import Flattener;
@@ -52,24 +53,25 @@ corruption_level=T.fscalar();
 
 images=X.reshape((batch_size, 1, 32, 32))
 layer_0_en=ReLUConvLayer(filter_size=(7,7),
-                         num_filters=100,
+                         num_filters=64,
                          num_channels=1,
                          fm_size=(32,32),
-                         batch_size=batch_size);
+                         batch_size=batch_size,
+                         border_mode="same");
                                                   
-layer_0_de=SigmoidConvLayer(filter_size=(7,7),
-                            num_filters=1,
-                            num_channels=100,
-                            fm_size=(26,26),
-                            batch_size=batch_size,
-                            border_mode="full");
+layer_0_de=IdentityConvLayer(filter_size=(7,7),
+                             num_filters=1,
+                             num_channels=64,
+                             fm_size=(32,32),
+                             batch_size=batch_size,
+                             border_mode="same");
                          
 model=ConvAutoEncoder(layers=[layer_0_en, layer_0_de]);
 
 out=model.fprop(images, corruption_level=corruption_level);
-cost=mean_square_cost(out[-1], images)+L2_regularization(model.params, 0.005);
+cost=mean_square_cost(out[-1], images)#+L2_regularization(model.params, 0.005);
 
-updates=gd_updates(cost=cost, params=model.params, method="sgd", learning_rate=0.1);
+updates=gd_updates(cost=cost, params=model.params, method="sgd", learning_rate=0.01, momentum=0.9);
 
 train=theano.function(inputs=[idx, corruption_level],
                       outputs=[cost],
@@ -93,7 +95,7 @@ while (epoch < n_epochs):
     if min_cost==None:
         min_cost=np.mean(c);
     else:
-        if (np.mean(c)<min_cost*0.5) or (max_iter>=20):
+        if (np.mean(c)<min_cost*0.5) or (max_iter>=10):
             min_cost=np.mean(c);
             corr_best=corr[0]
             corr=np.random.uniform(low=corr_best, high=corr_best+0.1, size=1).astype("float32");
@@ -115,24 +117,25 @@ out_trans=model_trans.fprop(images);
 ## construct new dConvAE
 
 layer_1_en=ReLUConvLayer(filter_size=(4,4),
-                         num_filters=50,
-                         num_channels=100,
-                         fm_size=(13,13),
-                         batch_size=batch_size);
+                         num_filters=32,
+                         num_channels=64,
+                         fm_size=(16,16),
+                         batch_size=batch_size,
+                         border_mode="same");
                                                    
-layer_1_de=SigmoidConvLayer(filter_size=(4,4),
-                            num_filters=100,
-                            num_channels=50,
-                            fm_size=(10,10),
-                            batch_size=batch_size,
-                            border_mode="full");
+layer_1_de=IdentityConvLayer(filter_size=(4,4),
+                             num_filters=64,
+                             num_channels=32,
+                             fm_size=(16,16),
+                             batch_size=batch_size,
+                             border_mode="same");
                              
 model_1=ConvAutoEncoder(layers=[layer_1_en, layer_1_de]);
 
 out_1=model_1.fprop(out_trans[-1], corruption_level=corruption_level);
-cost_1=mean_square_cost(out_1[-1], out_trans[-1])+L2_regularization(model_1.params, 0.005);
+cost_1=mean_square_cost(out_1[-1], out_trans[-1])#+L2_regularization(model_1.params, 0.005);
 
-updates=gd_updates(cost=cost_1, params=model_1.params, method="sgd", learning_rate=0.1);
+updates=gd_updates(cost=cost_1, params=model_1.params, method="sgd", learning_rate=0.01, momentum=0.9);
 
 train_1=theano.function(inputs=[idx, corruption_level],
                         outputs=[cost_1],
@@ -156,7 +159,7 @@ while (epoch < n_epochs):
     if min_cost==None:
         min_cost=np.mean(c);
     else:
-        if (np.mean(c)<min_cost*0.5) or (max_iter>=20):
+        if (np.mean(c)<min_cost*0.5) or (max_iter>=10):
             min_cost=np.mean(c);
             corr_best=corr[0]
             corr=np.random.uniform(low=corr_best, high=corr_best+0.1, size=1).astype("float32");
@@ -173,7 +176,7 @@ print "[MESSAGE] The Lyer 1 model is trained"
 pool_0=MaxPooling(pool_size=(2,2));
 pool_1=MaxPooling(pool_size=(2,2));
 flattener=Flattener();
-layer_2=ReLULayer(in_dim=50*25,
+layer_2=ReLULayer(in_dim=32*64,
                   out_dim=800);
 layer_3=SoftmaxLayer(in_dim=800,
                      out_dim=10);
@@ -181,7 +184,7 @@ model_sup=FeedForward(layers=[layer_0_en, pool_0, layer_1_en, pool_1, flattener,
  
 out_sup=model_sup.fprop(images);
 cost_sup=categorical_cross_entropy_cost(out_sup[-1], y);
-updates=gd_updates(cost=cost_sup, params=model_sup.params, method="sgd", learning_rate=0.1);
+updates=gd_updates(cost=cost_sup, params=model_sup.params, method="sgd", learning_rate=0.01, momentum=0.9);
  
 train_sup=theano.function(inputs=[idx],
                           outputs=cost_sup,
@@ -218,7 +221,7 @@ filters=model.layers[0].filters.get_value(borrow=True);
  
 pickle.dump(test_record, open("../data/stacked_improve_dconvae.pkl", "w"));
  
-for i in xrange(100):
+for i in xrange(64):
     image_adr="../data/stacked_improve_dconvae/stacked_improve_dconvae_filter_%d.eps" % (i);
     plt.imshow(filters[i, 0, :, :], cmap = plt.get_cmap('gray'), interpolation='nearest');
     plt.axis('off');

@@ -19,7 +19,7 @@ from telaugesa.optimize import gd_updates;
 from telaugesa.cost import mean_square_cost;
 from telaugesa.cost import L2_regularization;
 
-n_epochs=200;
+n_epochs=100;
 batch_size=200;
 nkerns=64;
 
@@ -55,7 +55,7 @@ layer_3=IdentityConvLayer(filter_size=(11, 11),
                          
 model=ConvAutoEncoder(layers=[layer_0, MaxPoolingSameSize((28, 28)), layer_3]);
 
-out=model.fprop(images, corruption_level=0.2);
+out=model.fprop(images, corruption_level=1.);
 cost=mean_square_cost(out[-1], images);#+L2_regularization(model.params, 0.005);
 
 updates=gd_updates(cost=cost, params=model.params, method="sgd", learning_rate=0.001, momentum=0.975);
@@ -81,7 +81,7 @@ filters=model.layers[-1].filters.get_value(borrow=True);
 
 for i in xrange(nkerns):    
 #     plt.subplot(10, 10, i);
-    image_adr="../data/dConvAE_0_1_fixed_mnist/dConvAE_0_1_fixed_mnist_%d.eps" % (i);
+    image_adr="../data/dConvAE_full_fixed_mnist/dConvAE_full_fixed_mnist_%d.eps" % (i);
     plt.imshow(filters[0, i, :, :], cmap = plt.get_cmap('gray'), interpolation='nearest');
     plt.axis('off');
     plt.savefig(image_adr , bbox_inches='tight', pad_inches=0);
