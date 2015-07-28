@@ -27,7 +27,10 @@ General requirements can be achieved by `Anaconda`. More specifically, you need:
    + Sigmoid Layer
    + ReLU Layer
    + Softmax Layer (classification layer)
-   + SVM [TODO]
+   + Highway Identity Layer
+   + Highway Tanh Layer
+   + Highway Sigmoid Layer
+   + Highway ReLU layer
 
 + ConvNet Layer
    + Identity Conv Layer

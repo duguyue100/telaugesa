@@ -95,7 +95,7 @@ while (epoch < n_epochs):
     if min_cost==None:
         min_cost=np.mean(c);
     else:
-        if (np.mean(c)<min_cost*0.5) or (max_iter>=10):
+        if (np.mean(c)<min_cost*0.5) or (max_iter>=5):
             min_cost=np.mean(c);
             corr_best=corr[0]
             corr=np.random.uniform(low=corr_best, high=corr_best+0.1, size=1).astype("float32");
@@ -159,7 +159,7 @@ while (epoch < n_epochs):
     if min_cost==None:
         min_cost=np.mean(c);
     else:
-        if (np.mean(c)<min_cost*0.5) or (max_iter>=10):
+        if (np.mean(c)<min_cost*0.5) or (max_iter>=5):
             min_cost=np.mean(c);
             corr_best=corr[0]
             corr=np.random.uniform(low=corr_best, high=corr_best+0.1, size=1).astype("float32");

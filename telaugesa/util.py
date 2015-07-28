@@ -22,6 +22,9 @@ def shared_floatx_zeros(shape, **kwargs):
     
     return shared_floatx(np.zeros(shape), **kwargs);
 
+def shared_floatx_ones(shape, value=1., **kwargs):
+    return shared_floatx(np.ones(shape)*value, **kwargs);
+
 def init_weights(name,
                  out_dim,
                  in_dim=None,
