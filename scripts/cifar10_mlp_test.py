@@ -19,13 +19,17 @@ from telaugesa.cost import categorical_cross_entropy_cost;
 n_epochs=100;
 batch_size=100;
 
-datasets=ds.load_mnist("../data/mnist.pkl.gz");
-train_set_x, train_set_y = datasets[0];
-valid_set_x, valid_set_y = datasets[1];
-test_set_x, test_set_y = datasets[2];
+Xtr, Ytr, Xte, Yte=ds.load_CIFAR10("../data/CIFAR10");
+
+Xtr=np.mean(Xtr, 3);
+Xte=np.mean(Xte, 3);
+Xtrain=Xtr.reshape(Xtr.shape[0], Xtr.shape[1]*Xtr.shape[2])/255.0;
+Xtest=Xte.reshape(Xte.shape[0], Xte.shape[1]*Xte.shape[2])/255.0;
+
+train_set_x, train_set_y=ds.shared_dataset((Xtrain, Ytr));
+test_set_x, test_set_y=ds.shared_dataset((Xtest, Yte));
 
 n_train_batches=train_set_x.get_value(borrow=True).shape[0]/batch_size;
-n_valid_batches=valid_set_x.get_value(borrow=True).shape[0]/batch_size;
 n_test_batches=test_set_x.get_value(borrow=True).shape[0]/batch_size;
 
 print "[MESSAGE] The data is loaded"
@@ -35,14 +39,14 @@ y=T.ivector("label");
 idx=T.lscalar();
 dropout_rate=T.fscalar();
 
-layer_0=ReLULayer(in_dim=784,
+layer_0=ReLULayer(in_dim=1024,
                   out_dim=500);
 layer_1=ReLULayer(in_dim=500,
                   out_dim=200);
 layer_2=SoftmaxLayer(in_dim=200,
                      out_dim=10);
                      
-dropout=multi_dropout([(batch_size, 784), (batch_size, 500), (batch_size, 200)], dropout_rate);
+dropout=multi_dropout([(batch_size, 1024), (batch_size, 500), (batch_size, 200)], dropout_rate);
                                           
 model=FeedForward(layers=[layer_0, layer_1, layer_2], dropout=dropout);
 model_test=FeedForward(layers=[layer_0, layer_1, layer_2]);
@@ -80,14 +84,14 @@ while (epoch < n_epochs):
         iteration = (epoch - 1) * n_train_batches + minibatch_index;
         
         if (iteration + 1) % n_train_batches == 0:
-            print 'MLP MODEL %.2f' % drs;
+            print 'MLP MODEL';
             test_losses = [test(i) for i in xrange(n_test_batches)];
             test_record[epoch-1] = np.mean(test_losses);
             
             print(('     epoch %i, minibatch %i/%i, test error %f %%') %
                   (epoch, minibatch_index + 1, n_train_batches, test_record[epoch-1] * 100.));
                   
-pickle.dump(test_record, open("../data/mlp_dropout_rand.pkl", "w"));
+pickle.dump(test_record, open("../data/cifar10_dropout_rand.pkl", "w"));
 
 filters=model.layers[0].W.get_value(borrow=True);
 
@@ -96,8 +100,8 @@ for i in xrange(100):
     plt.subplot(10, 10, i);
     plt.subplots_adjust(hspace = .001)
     plt.subplots_adjust(wspace = .001)
-    plt.imshow(np.reshape(filters[:,i], (28, 28)), cmap = plt.get_cmap('gray'), interpolation='nearest');
+    plt.imshow(np.reshape(filters[:,i], (32, 32)), cmap = plt.get_cmap('gray'), interpolation='nearest');
     plt.axis('off')
 
-plt.savefig("../data/mlp_dropout_filters_rand.eps", bbox_inches='tight', pad_inches=0);
+plt.savefig("../data/cifar10_dropout_filters_rand.eps", bbox_inches='tight', pad_inches=0);
 plt.show();
