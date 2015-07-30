@@ -2,7 +2,7 @@
 
 This is a implementation of Highway Networks which originally proposed in:
 
-[Highway Networks](http://arxiv.org/abs/1505.00387) by Rupesh Kumar Srivastava, Klaus Greff, Jürgen Schmidhuber.
+[Highway Networks](http://arxiv.org/abs/1505.00387) by Rupesh Kumar Srivastava, Klaus Greff, Jurgen Schmidhuber.
 
 + Highway Identity Layer
 + Highway Tanh Layer
@@ -55,6 +55,8 @@ class HighwayLayerBase(object):
         self.bias_t=bias_t;
         self.gate_bias=gate_bias;
         self.use_bias=use_bias;
+        
+        self.initialize();
         
     def initialize(self, weight_type="none"):
         """initialize weights
