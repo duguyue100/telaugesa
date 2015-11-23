@@ -210,3 +210,26 @@ def load_fer_2013(filename, expect_labels=True):
         np.save(Y_path, y)
     
     return X, y;
+  
+def load_ccs_data(filename):
+  """Loading Concrete Compressive Strength Data
+  
+  Parameters
+  ----------
+  filename : string
+      path of the dataset
+      
+  Returns
+  -------
+  X : array
+      Instances of data, size in (num_of_instances x dimension)
+  Y : vector
+      output variable as Concrete Compressive Strength (MPa)
+  """
+  
+  A=np.loadtxt(filename, dtype="float32", delimiter=',');
+    
+  X=A[:,:8];
+  y=A[:,-1];
+  
+  return X, y;

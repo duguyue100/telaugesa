@@ -12,8 +12,8 @@ This module implements several general cost functions
 
 import theano.tensor as T;
 
-def mean_square_cost(Y_hat, Y_star):
-    """Mean Square Reconstruction Cost
+def mean_squared_cost(Y_hat, Y_star):
+    """Mean Squared Reconstruction Cost
     
     Parameters
     ----------
@@ -31,7 +31,8 @@ def mean_square_cost(Y_hat, Y_star):
     #cost=T.sum(T.pow(T.sub(Y_hat, Y_star),2), axis=1);
     
     #return 0.5*T.mean(cost);
-    return T.mean((Y_hat - Y_star) ** 2);
+    #return T.mean((Y_hat - Y_star) ** 2);
+    return ((Y_hat-Y_star)**2).sum(axis=1).mean();
 
 def binary_cross_entropy_cost(Y_hat, Y_star):
     """Binary Cross Entropy Cost
