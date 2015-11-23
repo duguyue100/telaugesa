@@ -6,6 +6,7 @@ Email: duguyue100@gmail.com
 """
 
 import numpy as np;
+import numpy.linalg as LA;
 from mpl_toolkits.mplot3d import Axes3D;
 from matplotlib import cm;
 import matplotlib;
@@ -34,8 +35,12 @@ X_data, y_data=ds.load_ccs_data("../data/Concrete_Data.csv");
 
 X_data=X_data-np.mean(X_data, axis=0);
 X_data=X_data/np.std(X_data,axis=1).reshape((X_data.shape[0],1));
-# y_mean=np.mean(y_data);
-# y_data-=y_mean;
+#### PCA
+X_cov=X_data.T.dot(X_data)/X_data.shape[0];
+U, S, _ = LA.svd(X_cov);
+X_data=U.T.dot(X_data.T).T;
+X_data=X_data[:, :6];
+#### PCA
 
 X_train=X_data[:700, :];
 y_train=y_data[:700].reshape((700,1));
@@ -63,7 +68,7 @@ X=T.matrix("data");
 y=T.matrix("target");
 idx=T.lscalar();
 
-layers=[ReLULayer(in_dim=8, out_dim=30)];
+layers=[ReLULayer(in_dim=6, out_dim=30)];
 
 for i in xrange(20):
     layers.append(HighwayReLULayer(in_dim=30));

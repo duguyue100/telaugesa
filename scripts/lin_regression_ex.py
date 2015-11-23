@@ -7,6 +7,7 @@ Email: duguyue100@gmail.com
 
 import numpy as np;
 from mpl_toolkits.mplot3d import Axes3D;
+import numpy.linalg as LA;
 from matplotlib import cm;
 import matplotlib;
 matplotlib.use('tkagg');
@@ -35,6 +36,13 @@ X_data, y_data=ds.load_ccs_data("../data/Concrete_Data.csv");
 X_data=X_data-np.mean(X_data, axis=0);
 X_data=X_data/np.std(X_data,axis=1).reshape((X_data.shape[0],1));
 
+#### PCA
+X_cov=X_data.T.dot(X_data)/X_data.shape[0];
+U, S, _ = LA.svd(X_cov);
+X_data=U.T.dot(X_data.T).T;
+X_data=X_data[:, :6];
+#### PCA
+
 X_train=X_data[:700, :];
 y_train=y_data[:700].reshape((700,1));
 
@@ -61,7 +69,7 @@ X=T.matrix("data");
 y=T.matrix("target");
 idx=T.lscalar();
 
-layer_0=IdentityLayer(in_dim=8,
+layer_0=IdentityLayer(in_dim=6,
                       out_dim=1);
 
 model=FeedForward(layers=[layer_0]);
@@ -104,8 +112,8 @@ while (epoch < n_epochs):
 test_out=theano.function(inputs=[X],
                          outputs=out[-1]);
                          
-predict_out=test_out(X_train.get_value(borrow=True));
-real_out=y_train.get_value(borrow=True);
+predict_out=test_out(X_test.get_value(borrow=True));
+real_out=y_test.get_value(borrow=True);
 
 x_bar=np.arange(100);
 width=0.35;

@@ -6,6 +6,7 @@ Email: duguyue100@gmail.com
 """
 
 import numpy as np;
+import numpy.linalg as LA;
 from mpl_toolkits.mplot3d import Axes3D;
 from matplotlib import cm;
 import matplotlib;
@@ -24,7 +25,7 @@ from telaugesa.cost import mean_squared_cost, L2_regularization, binary_cross_en
 
 ### General Parameters
 
-n_epochs=120;
+n_epochs=100;
 batch_size=10;
 
 ### Load and process data
@@ -33,8 +34,13 @@ X_data, y_data=ds.load_ccs_data("../data/Concrete_Data.csv");
 
 X_data=X_data-np.mean(X_data, axis=0);
 X_data=X_data/np.std(X_data,axis=1).reshape((X_data.shape[0],1));
-# y_mean=np.mean(y_data);
-# y_data-=y_mean;
+
+#### PCA
+X_cov=X_data.T.dot(X_data)/X_data.shape[0];
+U, S, _ = LA.svd(X_cov);
+X_data=U.T.dot(X_data.T).T;
+X_data=X_data[:, :6];
+#### PCA
 
 X_train=X_data[:700, :];
 y_train=y_data[:700].reshape((700,1));
@@ -62,13 +68,13 @@ X=T.matrix("data");
 y=T.matrix("target");
 idx=T.lscalar();
 
-layer_0=TanhLayer(in_dim=8,
+layer_0=TanhLayer(in_dim=6,
                   out_dim=20);
 layer_1=TanhLayer(in_dim=20,
-                  out_dim=40);
-layer_2=TanhLayer(in_dim=40,
-                  out_dim=40);
-layer_3=ReLULayer(in_dim=40,
+                  out_dim=30);
+layer_2=TanhLayer(in_dim=30,
+                  out_dim=30);
+layer_3=ReLULayer(in_dim=30,
                   out_dim=20);
 layer_4=ReLULayer(in_dim=20,
                   out_dim=20);
@@ -118,11 +124,11 @@ test_out=theano.function(inputs=[X],
 predict_out=test_out(X_test.get_value(borrow=True));
 real_out=y_test.get_value(borrow=True);
 
-x_bar=np.arange(150);
+x_bar=np.arange(100);
 width=0.35;
 fig, ax = plt.subplots();
 
-rects1 = ax.bar(x_bar, real_out[:150], width, color='r');
-rects2 = ax.bar(x_bar + width, predict_out[:150], width, color='y')
+rects1 = ax.bar(x_bar, real_out[:100], width, color='r');
+rects2 = ax.bar(x_bar + width, predict_out[:100], width, color='y')
 
 plt.show();
